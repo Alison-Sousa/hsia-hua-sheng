@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Painel de consulta da produção de Hsia Hua Sheng, com fontes, formatos e evidências.">
+  <meta name="theme-color" content="#0d2b36">
+  <title>Acervo Hsia Hua Sheng</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script defer src="assets/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="Acervo Hsia Hua Sheng — início">
+      <span class="brand-mark" aria-hidden="true">HS</span>
+      <span><strong>Acervo Hsia Hua Sheng</strong><small>Mapa de publicações e participações</small></span>
+    </a>
+    <nav aria-label="Navegação principal">
+      <a href="#visao-geral">Visão geral</a><a href="#fontes">Fontes</a><a href="#publicacoes">Publicações</a>
+      <button class="nav-review" id="open-review" type="button"><span id="review-dot"></span>Revisão</button>
+    </nav>
+  </header>
+
+  <main id="conteudo">
+    <section class="hero" id="inicio">
+      <div class="hero-copy">
+        <p class="eyebrow">BASE HISTÓRICA RECONCILIADA</p>
+        <h1>Uma produção extensa,<br><em>aberta para conferência.</em></h1>
+        <p class="hero-lead">Explore publicações, entrevistas, vídeos e trabalhos acadêmicos. Cada número leva aos registros e às evidências que formam a contagem.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#fontes">Explorar por fonte</a>
+          <a class="button ghost" href="#publicacoes">Buscar uma publicação</a>
+        </div>
+      </div>
+      <div class="hero-summary" aria-label="Resumo da base">
+        <div class="summary-kicker"><span class="live-dot"></span>Base consultável</div>
+        <div class="hero-number" id="hero-total">—</div>
+        <p>manifestações documentadas</p>
+        <div class="hero-mini">
+          <span><strong id="hero-works">—</strong> obras relacionadas</span>
+          <span><strong id="hero-sources">—</strong> fontes</span>
+        </div>
+        <small id="updated-at">Carregando dados…</small>
+      </div>
+    </section>
+
+    <section class="section" id="visao-geral">
+      <div class="section-heading">
+        <div><p class="eyebrow">VISÃO GERAL</p><h2>O acervo em perspectiva</h2></div>
+        <p>A contagem considera manifestações: uma entrevista escrita e seu vídeo aparecem em seus respectivos formatos, mesmo quando pertencem à mesma produção.</p>
+      </div>
+      <div class="overview-grid">
+        <article class="panel chart-panel">
+          <div class="panel-title"><div><span>Distribuição</span><h3>Formatos encontrados</h3></div><span class="hint">Clique para filtrar</span></div>
+          <div id="category-chart" class="bar-chart" aria-label="Distribuição por formato"></div>
+        </article>
+        <article class="panel context-panel">
+          <p class="eyebrow">COMO LER</p>
+          <h3>Do número à evidência</h3>
+          <ol>
+            <li><span>1</span><p><strong>Escolha uma fonte</strong>Veja os formatos documentados naquele veículo.</p></li>
+            <li><span>2</span><p><strong>Abra a contagem</strong>O painel mostra exatamente os registros que a compõem.</p></li>
+            <li><span>3</span><p><strong>Confira a origem</strong>Acesse o link original, os créditos e a evidência preservada.</p></li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="fontes">
+      <div class="section-heading">
+        <div><p class="eyebrow">FONTES</p><h2>Volumetria por veículo</h2></div>
+        <p>Selecione qualquer número. Zeros não abrem registros; células preenchidas levam diretamente à lista correspondente.</p>
+      </div>
+      <div class="matrix-toolbar">
+        <label class="search compact"><span aria-hidden="true">⌕</span><input id="source-search" type="search" placeholder="Buscar fonte" autocomplete="off"></label>
+        <span id="source-count">— fontes</span>
+      </div>
+      <div class="matrix-shell">
+        <table id="source-matrix">
+          <caption class="sr-only">Manifestações por fonte e formato</caption>
+          <thead><tr id="matrix-head"></tr></thead>
+          <tbody id="matrix-body"></tbody>
+        </table>
+      </div>
+      <p class="matrix-note">Os totais acima são reproduzidos pelos registros individuais abaixo. Status e pendências permanecem visíveis sem alterar artificialmente os números.</p>
+    </section>
+
+    <section class="section publications-section" id="publicacoes">
+      <div class="section-heading">
+        <div><p class="eyebrow">PUBLICAÇÕES</p><h2 id="results-title">Todos os registros</h2></div>
+        <p id="results-summary">Carregando a base…</p>
+      </div>
+      <div class="filters" aria-label="Filtros das publicações">
+        <label class="search wide"><span aria-hidden="true">⌕</span><input id="query" type="search" placeholder="Título, autoria, repórter, tema ou item_id" autocomplete="off"></label>
+        <label><span>Fonte</span><select id="filter-source"><option value="">Todas</option></select></label>
+        <label><span>Formato</span><select id="filter-category"><option value="">Todos</option></select></label>
+        <label><span>Ano</span><select id="filter-year"><option value="">Todos</option></select></label>
+        <label><span>Ordem</span><select id="sort"><option value="recent">Mais recentes</option><option value="oldest">Mais antigos</option><option value="source">Fonte A–Z</option><option value="title">Título A–Z</option></select></label>
+        <button id="clear-filters" class="button subtle" type="button">Limpar filtros</button>
+      </div>
+      <div class="active-context" id="active-context" hidden></div>
+      <div id="cards" class="cards" aria-live="polite"></div>
+      <div class="empty" id="empty" hidden><strong>Nenhum registro neste recorte.</strong><span>Tente retirar um filtro ou buscar por outro termo.</span></div>
+      <button class="button load-more" id="load-more" type="button" hidden>Mostrar mais</button>
+    </section>
+
+    <section class="section review-invite">
+      <div>
+        <p class="eyebrow">REVISÃO COLABORATIVA</p>
+        <h2>Encontrou algo que merece correção?</h2>
+        <p>Marque um registro, acrescente uma publicação ou baixe a planilha revisada. As alterações ficam salvas neste navegador e podem ser baixadas em CSV, Excel ou como um pequeno arquivo de revisão.</p>
+      </div>
+      <button class="button primary" id="open-review-bottom" type="button">Abrir área de revisão</button>
+    </section>
+  </main>
+
+  <footer>
+    <div><strong>Acervo Hsia Hua Sheng</strong><p>Base organizada para consulta, conferência e revisão.</p></div>
+    <div><span>Dados gerados a partir de</span><code>painel_itens.csv</code></div>
+  </footer>
+
+  <dialog id="detail-dialog" class="modal detail-modal">
+    <div class="modal-head"><div><p class="eyebrow">DETALHES DO REGISTRO</p><h2 id="detail-title">Publicação</h2></div><button class="icon-button" data-close="detail-dialog" aria-label="Fechar">×</button></div>
+    <div id="detail-body"></div>
+  </dialog>
+
+  <dialog id="review-dialog" class="modal review-modal">
+    <div class="modal-head"><div><p class="eyebrow">ÁREA DE REVISÃO</p><h2>Conferir e atualizar</h2></div><button class="icon-button" data-close="review-dialog" aria-label="Fechar">×</button></div>
+    <div class="mode-strip">
+      <div><strong>Visualização</strong><span>Compare a base publicada com a revisão feita neste navegador.</span></div>
+      <label class="switch"><input id="apply-review" type="checkbox"><span></span>Aplicar revisão</label>
+    </div>
+    <div class="review-tabs" role="tablist">
+      <button class="active" data-tab="changes" type="button">Alterações <b id="change-count">0</b></button>
+      <button data-tab="add" type="button">Adicionar publicação</button>
+      <button data-tab="export" type="button">Baixar dados</button>
+      <button data-tab="manage" type="button">Como salvar</button>
+    </div>
+    <section class="review-pane active" data-pane="changes">
+      <div id="sync-status" class="sync-status">Verificando revisões compartilhadas…</div>
+      <div id="changes-list" class="changes-list"></div>
+    </section>
+    <section class="review-pane" data-pane="add">
+      <form id="add-form" class="add-form">
+        <label><span>Fonte *</span><input name="fonte" required placeholder="Ex.: Money Times"></label>
+        <label><span>Formato *</span><select name="categoria_painel" required></select></label>
+        <label class="full"><span>Título *</span><input name="titulo" required></label>
+        <label><span>Autoria, repórter ou produção</span><input name="autores" placeholder="Nome confirmado na página"></label>
+        <label><span>Ano</span><input name="ano" inputmode="numeric" pattern="[0-9]{4}" placeholder="2025"></label>
+        <label class="full"><span>URL original *</span><input name="url_original" type="url" required placeholder="https://…"></label>
+        <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3" placeholder="Explique onde Hsia aparece e por que o registro deve entrar."></textarea></label>
+        <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico da revisão"></label>
+        <label><span>Contato (opcional)</span><input name="contato" type="email"></label>
+        <button class="button primary full" type="submit">Adicionar à minha revisão</button>
+      </form>
+    </section>
+    <section class="review-pane" data-pane="export">
+      <div class="export-grid">
+        <button class="export-card" id="download-xlsx" type="button"><b>XLSX</b><strong>Planilha completa</strong><span>Publicações, volumetria e histórico em abas separadas.</span></button>
+        <button class="export-card" id="download-csv" type="button"><b>CSV</b><strong>Painel de itens</strong><span>Registros ativos na visualização escolhida.</span></button>
+        <button class="export-card" id="download-review" type="button"><b>JSON</b><strong>Pacote de revisão</strong><span>Arquivo pequeno para arquivar ou enviar ao GitHub.</span></button>
+        <label class="export-card file-card"><b>IMPORTAR</b><strong>Pacote de revisão</strong><span>Recupere uma revisão salva neste navegador.</span><input id="import-review" type="file" accept=".json,application/json"></label>
+      </div>
+    </section>
+    <section class="review-pane" data-pane="manage">
+      <div class="admin-box">
+        <h3>Levar a revisão para o GitHub</h3>
+        <p>Baixe o pacote JSON na aba “Baixar dados” e substitua <code>dashboard/data/revisoes_aprovadas.json</code> no repositório. A automação recompõe os CSVs e o Excel do dashboard.</p>
+        <button id="load-pending" class="button dark" type="button">Ver orientação rápida</button>
+        <div id="pending-list" class="pending-list"></div>
+      </div>
+    </section>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript>Este painel precisa de JavaScript para filtrar e abrir os registros.</noscript>
+</body>
+</html>
