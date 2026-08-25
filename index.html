@@ -128,15 +128,12 @@
 
   <dialog id="review-dialog" class="modal review-modal">
     <div class="modal-head"><div><p class="eyebrow">ÁREA DE REVISÃO</p><h2>Conferir e atualizar</h2></div><button class="icon-button" data-close="review-dialog" aria-label="Fechar">×</button></div>
-    <div class="mode-strip">
-      <div><strong>Visualização</strong><span>Compare a base publicada com a revisão feita neste navegador.</span></div>
-      <label class="switch"><input id="apply-review" type="checkbox"><span></span>Aplicar revisão</label>
-    </div>
+
+
     <div class="review-tabs" role="tablist">
       <button class="active" data-tab="changes" type="button">Alterações <b id="change-count">0</b></button>
       <button data-tab="add" type="button">Adicionar publicação</button>
-      <button data-tab="export" type="button">Baixar dados</button>
-      <button data-tab="manage" type="button">Como salvar</button>
+      <button data-tab="export" type="button">Baixar base</button>
     </div>
     <section class="review-pane active" data-pane="changes">
       <div id="sync-status" class="sync-status">Verificando revisões compartilhadas…</div>
@@ -153,27 +150,32 @@
         <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3" placeholder="Explique onde Hsia aparece e por que o registro deve entrar."></textarea></label>
         <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico da revisão"></label>
         <label><span>Contato (opcional)</span><input name="contato" type="email"></label>
-        <button class="button primary full" type="submit">Adicionar à minha revisão</button>
+        <button class="button primary full" type="submit">Adicionar e publicar</button>
       </form>
     </section>
     <section class="review-pane" data-pane="export">
       <div class="export-grid">
-        <button class="export-card" id="download-xlsx" type="button"><b>XLSX</b><strong>Planilha completa</strong><span>Publicações, volumetria e histórico em abas separadas.</span></button>
-        <button class="export-card" id="download-csv" type="button"><b>CSV</b><strong>Painel de itens</strong><span>Registros ativos na visualização escolhida.</span></button>
-        <button class="export-card" id="download-review" type="button"><b>JSON</b><strong>Pacote de revisão</strong><span>Arquivo pequeno para arquivar ou enviar ao GitHub.</span></button>
-        <label class="export-card file-card"><b>IMPORTAR</b><strong>Pacote de revisão</strong><span>Recupere uma revisão salva neste navegador.</span><input id="import-review" type="file" accept=".json,application/json"></label>
-      </div>
-    </section>
-    <section class="review-pane" data-pane="manage">
-      <div class="admin-box">
-        <h3>Levar a revisão para o GitHub</h3>
-        <p>Baixe o pacote JSON na aba “Baixar dados” e substitua <code>data/revisoes_aprovadas.json</code> no repositório. A automação recompõe os CSVs e o Excel do dashboard.</p>
-        <button id="load-pending" class="button dark" type="button">Ver orientação rápida</button>
-        <div id="pending-list" class="pending-list"></div>
+        <button class="export-card" id="download-xlsx" type="button"><b>XLSX</b><strong>Baixar base completa</strong><span>Publicações, volumetria e histórico em abas separadas.</span></button>
+        <button class="export-card" id="download-csv" type="button"><b>CSV</b><strong>Baixar publicações</strong><span>Todos os registros ativos da base atualizada.</span></button>
       </div>
     </section>
   </dialog>
 
+  <dialog id="edit-dialog" class="modal detail-modal">
+    <div class="modal-head"><div><p class="eyebrow">EDITAR REGISTRO</p><h2>Editar publicação</h2></div><button class="icon-button" data-close="edit-dialog" aria-label="Fechar">×</button></div>
+    <form id="edit-form" class="add-form edit-form">
+      <input name="original_id" type="hidden">
+      <label><span>Fonte *</span><input name="fonte" required></label>
+      <label><span>Formato *</span><select name="categoria_painel" required></select></label>
+      <label class="full"><span>Título *</span><input name="titulo" required></label>
+      <label><span>Autoria, repórter ou produção</span><input name="autores"></label>
+      <label><span>Ano</span><input name="ano" inputmode="numeric" pattern="[0-9]{4}"></label>
+      <label class="full"><span>URL original *</span><input name="url_original" type="url" required></label>
+      <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3"></textarea></label>
+      <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico"></label>
+      <button class="button primary full" type="submit">Salvar e publicar alteração</button>
+    </form>
+  </dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <noscript>Este painel precisa de JavaScript para filtrar e abrir os registros.</noscript>
 </body>

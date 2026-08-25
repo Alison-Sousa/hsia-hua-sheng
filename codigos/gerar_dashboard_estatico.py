@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera dashboard/data/dashboard.json a partir dos painéis reconciliados."""
+"""Gera data/dashboard.json a partir dos painéis reconciliados."""
 from __future__ import annotations
 import argparse, csv, html, json, re, sys, unicodedata
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 
 ROOT=Path(__file__).resolve().parents[1]
 ITEMS=ROOT/"paineis"/"painel_itens.csv"; VOLUME=ROOT/"paineis"/"painel_volumetria.csv"
-OUTDIR=ROOT/"dashboard"/"data"; OUT=OUTDIR/"dashboard.json"; CREDITS=OUTDIR/"creditos_editoriais.json"
+OUTDIR=ROOT/"data"; OUT=OUTDIR/"dashboard.json"; CREDITS=OUTDIR/"creditos_editoriais.json"
 CATEGORIES={
  "colunas_autorais":"Colunas autorais","entrevistas_escritas_completas":"Entrevistas escritas",
  "transcricoes_palestras_aulas":"Transcrições e aulas","participacoes_em_reportagens":"Participações em reportagens",

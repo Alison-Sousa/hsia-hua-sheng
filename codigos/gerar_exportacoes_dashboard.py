@@ -3,7 +3,7 @@
 """Aplica revisões do dashboard e gera CSVs/XLSX de consulta.
 
 Não altera a base reconciliada em paineis/: as saídas revisadas ficam em
-dashboard/data/ e preservam um histórico explícito.
+data/ e preservam um histórico explícito.
 """
 from __future__ import annotations
 import csv, json
@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-DATA=ROOT/"dashboard"/"data"
+DATA=ROOT/"data"
 DASH=DATA/"dashboard.json"
 REVISIONS=DATA/"revisoes_aprovadas.json"
 OUT_ITEMS=DATA/"painel_itens.csv"

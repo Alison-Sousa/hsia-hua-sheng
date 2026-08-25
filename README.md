@@ -23,15 +23,16 @@ Os créditos editoriais ficam em `data/creditos_editoriais.json`. Eles aparecem 
 
 ## Revisar pelo site
 
-As inclusões e remoções ficam no navegador até serem exportadas. Na área **Revisão**, é possível:
+A revisão é aberta e automática, sem login ou senha. Qualquer visitante pode:
 
-- marcar ou restaurar uma manifestação;
-- acrescentar uma publicação com fonte, formato, URL e evidência;
-- comparar a base publicada com a revisão;
-- baixar `painel_itens_atualizado.csv`, `acervo_hsia_atualizado.xlsx` ou `revisoes_dashboard.json`.
+- adicionar uma publicação;
+- editar os dados de uma publicação existente;
+- remover ou restaurar uma publicação;
+- baixar a base completa em XLSX ou as publicações em CSV.
 
-Para registrar a revisão no repositório, substitua `data/revisoes_aprovadas.json` pelo JSON baixado e envie a mudança ao GitHub. O workflow `.github/workflows/dashboard-revisoes.yml` recompõe automaticamente os CSVs e o Excel. A base original em `paineis/` não é alterada silenciosamente.
+Cada alteração é gravada em `data/revisoes_aprovadas.json` no GitHub. O workflow `.github/workflows/dashboard-revisoes.yml` recompõe automaticamente os CSVs, o JSON do painel e o Excel.
 
+Para ativar a gravação automática, crie no Netlify a variável secreta `GITHUB_TOKEN` com um token fine-grained do GitHub limitado ao repositório `Alison-Sousa/hsia-hua-sheng` e com permissão **Contents: Read and write**. Depois, faça um novo deploy. O token nunca é enviado ao navegador.
 ## Publicar no Netlify
 
 Use `.` como diretório de publicação e deixe o comando de build vazio. Também é possível arrastar esta pasta para um deploy manual. Não há banco de dados, login nem dependência no navegador.

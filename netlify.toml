@@ -1,3 +1,13 @@
 [build]
   base = "."
   publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/revisions"
+  to = "/.netlify/functions/revisions"
+  status = 200
+  force = true

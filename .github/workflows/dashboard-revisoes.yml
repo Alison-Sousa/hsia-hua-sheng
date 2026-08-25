@@ -28,22 +28,10 @@ jobs:
           python-version: "3.12"
       - name: Instalar dependência do Excel
         run: python -m pip install openpyxl==3.1.5
-      - name: Preparar diretório temporário de geração
-        run: |
-          mkdir -p dashboard/data
-          cp data/revisoes_aprovadas.json dashboard/data/revisoes_aprovadas.json
-          cp data/creditos_editoriais.json dashboard/data/creditos_editoriais.json
       - name: Gerar dados e planilhas
         run: |
           python codigos/gerar_dashboard_estatico.py
           python codigos/gerar_exportacoes_dashboard.py
-      - name: Levar resultados para a raiz do site
-        run: |
-          cp dashboard/data/dashboard.json data/dashboard.json
-          cp dashboard/data/painel_itens.csv data/painel_itens.csv
-          cp dashboard/data/painel_volumetria.csv data/painel_volumetria.csv
-          cp dashboard/data/acervo_hsia_atualizado.xlsx data/acervo_hsia_atualizado.xlsx
-          cp dashboard/data/creditos_editoriais.json data/creditos_editoriais.json
       - name: Validar arquivos gerados
         run: |
           python - <<'PY'
