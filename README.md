@@ -34,7 +34,7 @@ Para registrar a revisão no repositório, substitua `data/revisoes_aprovadas.js
 
 ## Publicar no Netlify
 
-Use `dashboard` como diretório de publicação e deixe o comando de build vazio. Também é possível arrastar esta pasta para um deploy manual. Não há banco de dados, login nem dependência no navegador.
+Use `.` como diretório de publicação e deixe o comando de build vazio. Também é possível arrastar esta pasta para um deploy manual. Não há banco de dados, login nem dependência no navegador.
 
 ## Estrutura
 

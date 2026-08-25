@@ -149,11 +149,11 @@ function bind(){
  $("#download-csv").onclick=()=>download("painel_itens_atualizado.csv",new Blob([csvText(exportRows())],{type:"text/csv;charset=utf-8"}));$("#download-xlsx").onclick=()=>download("acervo_hsia_atualizado.xlsx",xlsxBlob());
  $("#download-review").onclick=()=>download("revisoes_dashboard.json",new Blob([JSON.stringify({...state.revisions,exportado_por:state.email,exportado_em:new Date().toISOString()},null,2)],{type:"application/json"}));
  $("#import-review").onchange=async e=>{try{const data=JSON.parse(await e.target.files[0].text());state.revisions={removed:data.removed||[],added:data.added||[],history:data.history||[]};localStorage.setItem(LOCAL_KEY,JSON.stringify(state.revisions));state.remote=false;renderAll();toast("Pacote de revisão importado.")}catch{toast("Arquivo de revisão inválido.")}};
- $("#load-pending").onclick=()=>toast("Baixe o JSON e envie-o para dashboard/data/revisoes_aprovadas.json no GitHub.");
+ $("#load-pending").onclick=()=>toast("Baixe o JSON e envie-o para data/revisoes_aprovadas.json no GitHub.");
 }
 async function init(){
  try{await login();const res=await fetch("data/dashboard.json",{cache:"no-store"});if(!res.ok)throw Error(`HTTP ${res.status}`);state.data=await res.json();await loadRevisions();bind();renderAll()}
- catch(error){document.body.innerHTML=`<main class="fatal"><h1>Não foi possível abrir o acervo.</h1><p>${esc(error.message)}</p><p>Gere <code>dashboard/data/dashboard.json</code> antes de publicar.</p></main>`}
+ catch(error){document.body.innerHTML=`<main class="fatal"><h1>Não foi possível abrir o acervo.</h1><p>${esc(error.message)}</p><p>Gere <code>data/dashboard.json</code> antes de publicar.</p></main>`}
 }
 init();
 })();
