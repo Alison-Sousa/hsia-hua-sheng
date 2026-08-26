@@ -6,8 +6,11 @@ on:
       - "data/revisoes_aprovadas.json"
       - "paineis/painel_itens.csv"
       - "paineis/painel_volumetria.csv"
+      - "paineis/painel_nlp.csv"
+      - "paineis/painel_dados_atualizaveis.csv"
       - "codigos/gerar_dashboard_estatico.py"
       - "codigos/gerar_exportacoes_dashboard.py"
+      - "codigos/livro_dashboard.py"
   workflow_dispatch:
 
 permissions:
@@ -38,16 +41,19 @@ jobs:
           import csv, json
           from pathlib import Path
           data=json.loads(Path("data/dashboard.json").read_text(encoding="utf-8"))
+          livro=json.loads(Path("data/livro.json").read_text(encoding="utf-8"))
           with Path("data/painel_itens.csv").open(encoding="utf-8-sig") as f:
               rows=list(csv.DictReader(f))
           assert rows, "painel_itens.csv ficou vazio"
           assert all(r["manifestacao_id"] and r["titulo"] and r["fonte"] for r in rows)
+          assert len(livro["chapters"]) == 17 and livro["relations"], "livro.json ficou incompleto"
+          assert all(r["item_id"] in livro["items"] for r in livro["relations"])
           print(f"{len(rows)} manifestações validadas")
           PY
       - name: Registrar resultados atualizados
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/dashboard.json data/painel_itens.csv data/painel_volumetria.csv data/acervo_hsia_atualizado.xlsx data/creditos_editoriais.json
+          git add data/dashboard.json data/livro.json data/painel_itens.csv data/painel_volumetria.csv data/acervo_hsia_atualizado.xlsx data/creditos_editoriais.json
           git diff --cached --quiet || git commit -m "dashboard: atualizar CSVs e Excel"
           git push

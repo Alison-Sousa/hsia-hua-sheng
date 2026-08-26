@@ -9,6 +9,7 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/styles.css">
   <script defer src="assets/app.js"></script>
+  <script defer src="assets/livro.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -18,7 +19,7 @@
       <span><strong>Acervo Hsia Hua Sheng</strong><small>Mapa de publicações e participações</small></span>
     </a>
     <nav aria-label="Navegação principal">
-      <a href="#visao-geral">Visão geral</a><a href="#fontes">Fontes</a><a href="#publicacoes">Publicações</a>
+      <a href="#visao-geral">Visão geral</a><a href="#fontes">Fontes</a><a href="#publicacoes">Publicações</a><a href="#livro">Livro</a>
       <button class="nav-review" id="open-review" type="button"><span id="review-dot"></span>Revisão</button>
     </nav>
   </header>
@@ -106,6 +107,57 @@
       <button class="button load-more" id="load-more" type="button" hidden>Mostrar mais</button>
     </section>
 
+    <section class="book-section" id="livro" aria-labelledby="book-title">
+      <div class="book-shell">
+        <header class="book-intro">
+          <div class="book-intro-copy">
+            <p class="eyebrow">CURADORIA EDITORIAL</p>
+            <h2 id="book-title">A Nova Economia Global:<br><em>China, Mercado e Futuro do Sistema Financeiro</em></h2>
+          </div>
+          <div class="book-mother-question">
+            <span>Pergunta-mãe</span>
+            <p>Como a transformação da economia real chinesa, a evolução de seu sistema financeiro e a crescente integração com países como o Brasil estão criando as bases de uma arquitetura financeira internacional mais multipolar, eficiente e menos dependente de um único centro financeiro e de uma única moeda?</p>
+          </div>
+          <div class="book-summary" aria-label="Resumo editorial">
+            <span><strong id="book-chapter-total">17</strong> capítulos</span>
+            <span><strong id="book-relation-total">—</strong> relações editoriais</span>
+            <span><strong id="book-item-total">—</strong> obras selecionadas</span>
+          </div>
+        </header>
+
+        <div id="book-loading" class="book-loading">Organizando capítulos e obras…</div>
+        <div id="book-content" hidden>
+          <div class="book-toolbar" aria-label="Filtros do Livro">
+            <label class="book-search"><span>Buscar obra</span><input id="book-filter-query" type="search" placeholder="Título ou fonte" autocomplete="off"></label>
+            <label><span>Capítulo</span><select id="book-filter-chapter"><option value="">Escolha um capítulo</option></select></label>
+            <label><span>Relação</span><select id="book-filter-classification"><option value="">Todas</option><option value="exclusivo">Exclusivos</option><option value="compartilhado">Compartilhados</option></select></label>
+            <label><span>Tipo</span><select id="book-filter-type"><option value="">Todos</option></select></label>
+            <label><span>Aderência mínima</span><select id="book-filter-adherence"><option value="0">Todas</option><option value="70">70%</option><option value="85">85%</option><option value="95">95%</option></select></label>
+            <label><span>Dado atualizável</span><select id="book-filter-update"><option value="">Todos</option><option value="yes">Com dados</option><option value="no">Sem dados</option></select></label>
+            <label><span>Ordem</span><select id="book-filter-sort"><option value="adherence">Maior aderência</option><option value="year">Mais recentes</option><option value="title">Título A–Z</option></select></label>
+            <button id="book-clear-filters" class="button subtle" type="button">Limpar</button>
+          </div>
+
+          <div class="book-section-heading">
+            <div><p class="eyebrow">ESTRUTURA DO LIVRO</p><h3>Seis partes, dezessete perguntas</h3></div>
+            <p>Abra um capítulo para revisar suas obras exclusivas e compartilhadas.</p>
+          </div>
+          <div id="book-parts" class="book-parts"></div>
+
+          <section id="book-workspace" class="book-workspace" hidden aria-live="polite">
+            <div class="book-workspace-head">
+              <div><p class="eyebrow" id="book-current-part">CAPÍTULO</p><h3 id="book-current-title"></h3><p id="book-current-question"></p></div>
+              <div class="book-workspace-actions"><span id="book-results-count"></span><button class="button primary" id="book-open-add" type="button">Adicionar obra do acervo</button></div>
+            </div>
+            <div class="book-columns">
+              <section class="book-relation-group"><div class="book-group-title"><span>Exclusivos</span><b id="book-exclusive-count">0</b></div><div id="book-exclusive-list" class="book-work-list"></div></section>
+              <section class="book-relation-group"><div class="book-group-title"><span>Compartilhados</span><b id="book-shared-count">0</b></div><div id="book-shared-list" class="book-work-list"></div></section>
+            </div>
+            <details class="book-archive"><summary>Itens arquivados <b id="book-archived-count">0</b></summary><div id="book-archived-list" class="book-work-list"></div></details>
+          </section>
+        </div>
+      </div>
+    </section>
     <section class="section review-invite">
       <div>
         <p class="eyebrow">REVISÃO COLABORATIVA</p>
@@ -155,7 +207,7 @@
     </section>
     <section class="review-pane" data-pane="export">
       <div class="export-grid">
-        <button class="export-card" id="download-xlsx" type="button"><b>XLSX</b><strong>Baixar base completa</strong><span>Publicações, volumetria e histórico em abas separadas.</span></button>
+        <button class="export-card" id="download-xlsx" type="button"><b>XLSX</b><strong>Baixar base completa</strong><span>Publicações, volumetria, capítulos e histórico em abas separadas.</span></button>
         <button class="export-card" id="download-csv" type="button"><b>CSV</b><strong>Baixar publicações</strong><span>Todos os registros ativos da base atualizada.</span></button>
       </div>
     </section>
@@ -174,6 +226,37 @@
       <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3"></textarea></label>
       <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico"></label>
       <button class="button primary full" type="submit">Salvar e publicar alteração</button>
+    </form>
+  </dialog>
+  <dialog id="book-updates-dialog" class="modal book-modal">
+    <div class="modal-head"><div><p class="eyebrow">DADOS DA OBRA</p><h2 id="book-updates-title">Dados potencialmente atualizáveis</h2></div><button class="icon-button" data-book-close="book-updates-dialog" aria-label="Fechar">×</button></div>
+    <div id="book-updates-body" class="book-modal-body"></div>
+  </dialog>
+
+  <dialog id="book-edit-dialog" class="modal detail-modal">
+    <div class="modal-head"><div><p class="eyebrow">DECISÃO EDITORIAL</p><h2>Editar relação com o capítulo</h2></div><button class="icon-button" data-book-close="book-edit-dialog" aria-label="Fechar">×</button></div>
+    <form id="book-edit-form" class="book-form">
+      <input name="relation_id" type="hidden">
+      <label><span>Capítulo</span><select name="chapter" required></select></label>
+      <label><span>Relação atual</span><select name="classification" required><option value="exclusivo">Exclusivo</option><option value="compartilhado">Compartilhado</option></select></label>
+      <label class="full"><span>Observação editorial</span><textarea name="observation" rows="4" placeholder="Registre aqui a decisão ou o ponto que merece atenção."></textarea></label>
+      <label class="full"><span>Seu nome</span><input name="reviewer" placeholder="Para o histórico da curadoria"></label>
+      <div class="book-form-actions full"><button class="button subtle book-archive-button" id="book-archive-relation" type="button">Arquivar relação</button><button class="button subtle" id="book-restore-nlp" type="button">Restaurar sugestão inicial</button><button class="button primary" type="submit">Salvar decisão</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="book-add-dialog" class="modal detail-modal">
+    <div class="modal-head"><div><p class="eyebrow">OBRA DO ACERVO</p><h2>Adicionar ao capítulo</h2></div><button class="icon-button" data-book-close="book-add-dialog" aria-label="Fechar">×</button></div>
+    <form id="book-add-form" class="book-form">
+      <label class="full"><span>Buscar título ou fonte</span><input id="book-add-search" type="search" autocomplete="off" placeholder="Comece a digitar para encontrar uma obra"></label>
+      <input name="item_id" type="hidden" required>
+      <div id="book-add-results" class="book-add-results full"></div>
+      <div id="book-add-selected" class="book-add-selected full" hidden></div>
+      <label><span>Capítulo</span><select name="chapter" required></select></label>
+      <label><span>Relação</span><select name="classification" required><option value="exclusivo">Exclusivo</option><option value="compartilhado">Compartilhado</option></select></label>
+      <label class="full"><span>Observação editorial</span><textarea name="observation" rows="3" placeholder="Por que esta obra deve entrar neste capítulo?"></textarea></label>
+      <label class="full"><span>Seu nome</span><input name="reviewer" placeholder="Para o histórico da curadoria"></label>
+      <button class="button primary full" type="submit">Adicionar ao capítulo</button>
     </form>
   </dialog>
   <div id="toast" role="status" aria-live="polite"></div>

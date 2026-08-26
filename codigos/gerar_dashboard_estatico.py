@@ -10,9 +10,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
+from livro_dashboard import build_book_payload
+
 ROOT=Path(__file__).resolve().parents[1]
 ITEMS=ROOT/"paineis"/"painel_itens.csv"; VOLUME=ROOT/"paineis"/"painel_volumetria.csv"
-OUTDIR=ROOT/"data"; OUT=OUTDIR/"dashboard.json"; CREDITS=OUTDIR/"creditos_editoriais.json"
+NLP=ROOT/"paineis"/"painel_nlp.csv"; UPDATES=ROOT/"paineis"/"painel_dados_atualizaveis.csv"
+OUTDIR=ROOT/"data"; OUT=OUTDIR/"dashboard.json"; BOOK_OUT=OUTDIR/"livro.json"; CREDITS=OUTDIR/"creditos_editoriais.json"
 CATEGORIES={
  "colunas_autorais":"Colunas autorais","entrevistas_escritas_completas":"Entrevistas escritas",
  "transcricoes_palestras_aulas":"Transcrições e aulas","participacoes_em_reportagens":"Participações em reportagens",
@@ -127,9 +130,10 @@ def build(rows,volumes,cache):
 
 def main():
  parser=argparse.ArgumentParser(); parser.add_argument("--atualizar-creditos",action="store_true"); parser.add_argument("--limite-creditos",type=int,default=60); args=parser.parse_args()
- if not ITEMS.exists() or not VOLUME.exists(): print("Painéis obrigatórios ausentes.",file=sys.stderr); return 2
+ if not all(path.exists() for path in (ITEMS,VOLUME,NLP,UPDATES)): print("Painéis obrigatórios ausentes.",file=sys.stderr); return 2
  rows,volumes,cache=read_csv(ITEMS),read_csv(VOLUME),load_cache()
  if args.atualizar_creditos: cache=update_cache(rows,cache,max(args.limite_creditos,0))
- payload=build(rows,volumes,cache); OUTDIR.mkdir(parents=True,exist_ok=True); OUT.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
- print(f"{OUT.relative_to(ROOT)}: {payload['meta']['total_manifestacoes']} manifestações, {payload['meta']['total_fontes']} fontes"); return 0
+ payload=build(rows,volumes,cache); book=build_book_payload(ITEMS,NLP,UPDATES); OUTDIR.mkdir(parents=True,exist_ok=True); OUT.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
+ BOOK_OUT.write_text(json.dumps(book,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
+ print(f"{OUT.relative_to(ROOT)}: {payload['meta']['total_manifestacoes']} manifestações | {BOOK_OUT.relative_to(ROOT)}: {book['meta']['total_relations']} relações"); return 0
 if __name__=="__main__": raise SystemExit(main())

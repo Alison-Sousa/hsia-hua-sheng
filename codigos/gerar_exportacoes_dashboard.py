@@ -11,9 +11,12 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from livro_dashboard import book_export_rows
+
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 DASH=DATA/"dashboard.json"
+BOOK=DATA/"livro.json"
 REVISIONS=DATA/"revisoes_aprovadas.json"
 OUT_ITEMS=DATA/"painel_itens.csv"
 OUT_VOLUME=DATA/"painel_volumetria.csv"
@@ -65,7 +68,7 @@ def volumes(rows,dashboard):
 def write_csv(path,rows,fields):
  with path.open("w",encoding="utf-8-sig",newline="") as f:
   writer=csv.DictWriter(f,fieldnames=fields,extrasaction="ignore");writer.writeheader();writer.writerows(rows)
-def write_xlsx(rows,volume,history):
+def write_xlsx(rows,volume,history,book_rows):
  try:
   from openpyxl import Workbook
   from openpyxl.styles import Font, PatternFill
@@ -82,11 +85,16 @@ def write_xlsx(rows,volume,history):
  add(ws,rows,FIELDS)
  vfields=["fonte","forma_de_acesso",*CATEGORIES,"total_producoes_unicas","pendentes","status_reconciliacao"]
  add(wb.create_sheet("Volumetria"),volume,vfields)
- hfields=["type","reviewer","changed_at","manifestacao_id","item_id","titulo","fonte"]
+ chapter_fields=["capitulo","parte","pergunta","item_id","titulo","classificacao_atual","capitulo_nlp_original","classificacao_nlp_original","aderencia_nlp","justificativa","contribuicao_para_pergunta","fonte","url","observacao_editorial","dado_atualizavel","status"]
+ add(wb.create_sheet("Capítulos"),book_rows,chapter_fields)
+ hfields=["type","reviewer","changed_at","relation_id","manifestacao_id","item_id","chapter","old_value","new_value","titulo","fonte"]
  flat=[]
  for entry in history:
   item=entry.get("item",{}) if isinstance(entry,dict) else {}
-  flat.append({k:entry.get(k,item.get(k,"")) for k in hfields})
+  row={k:entry.get(k,item.get(k,"")) for k in hfields}
+  for key in ("old_value","new_value"):
+   if isinstance(row[key],(dict,list)):row[key]=json.dumps(row[key],ensure_ascii=False,sort_keys=True)
+  flat.append(row)
  add(wb.create_sheet("Histórico"),flat,hfields)
  wb.properties.title="Acervo Hsia Hua Sheng — revisão do dashboard"
  wb.properties.modified=datetime.now(timezone.utc).replace(tzinfo=None)
@@ -95,10 +103,11 @@ def write_xlsx(rows,volume,history):
 def main():
  dashboard=load(DASH,None)
  if not dashboard:raise SystemExit(f"Arquivo ausente ou inválido: {DASH}")
- revisions=load(REVISIONS,{"removed":[],"added":[],"history":[]})
+ revisions=load(REVISIONS,{"removed":[],"added":[],"book_relations":[],"history":[]})
+ book=load(BOOK,{"chapters":[],"items":{},"relations":[],"updates":[]});book_rows=book_export_rows(book,revisions)
  rows=active_rows(dashboard,revisions);volume=volumes(rows,dashboard)
  write_csv(OUT_ITEMS,rows,FIELDS)
  vfields=["fonte","forma_de_acesso",*CATEGORIES,"total_producoes_unicas","pendentes","status_reconciliacao"]
- write_csv(OUT_VOLUME,volume,vfields);write_xlsx(rows,volume,revisions.get("history",[]))
- print(f"{len(rows)} manifestações | {len(volume)} fontes | {OUT_XLSX.relative_to(ROOT)}")
+ write_csv(OUT_VOLUME,volume,vfields);write_xlsx(rows,volume,revisions.get("history",[]),book_rows)
+ print(f"{len(rows)} manifestações | {len(book_rows)} relações de capítulos | {OUT_XLSX.relative_to(ROOT)}")
 if __name__=="__main__":main()

@@ -7,7 +7,7 @@ const FILE_PATH = "data/revisoes_aprovadas.json";
 const TOKEN = process.env.GITHUB_TOKEN;
 const MAX_BODY_BYTES = 250_000;
 const MAX_HISTORY = 2_000;
-const ALLOWED_TYPES = new Set(["add", "edit", "remove", "restore"]);
+const ALLOWED_TYPES = new Set(["add", "edit", "remove", "restore", "book_add", "book_update", "book_archive", "book_restore"]);
 const ITEM_FIELDS = [
   "fonte", "categoria_painel", "manifestacao_id", "item_id",
   "producao_principal_item_id", "manifestacao_derivada_de_item_id",
@@ -30,7 +30,7 @@ const json = (data, status = 200) => new Response(JSON.stringify(data), {
 });
 
 function emptyState() {
-  return { removed: [], added: [], history: [], updated_at: null };
+  return { removed: [], added: [], book_relations: [], history: [], updated_at: null };
 }
 
 function cleanText(value, max = 500) {
@@ -69,11 +69,32 @@ function cleanItem(input) {
   return item;
 }
 
+function cleanBookRelation(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Relacao do livro invalida.");
+  const chapter = Number(input.chapter);
+  const nlpChapter = input.nlp_chapter === "" || input.nlp_chapter == null ? "" : Number(input.nlp_chapter);
+  const classification = cleanText(input.classification, 30).toLowerCase();
+  if (!cleanText(input.relation_id, 300) || !cleanText(input.item_id, 240)) throw new Error("Relacao e item_id sao obrigatorios.");
+  if (!Number.isInteger(chapter) || chapter < 1 || chapter > 17) throw new Error("Capitulo invalido.");
+  if (!["exclusivo", "compartilhado"].includes(classification)) throw new Error("Classificacao invalida.");
+  return {
+    relation_id: cleanText(input.relation_id, 300),
+    item_id: cleanText(input.item_id, 240),
+    chapter,
+    classification,
+    observation: cleanText(input.observation, 5_000),
+    active: input.active !== false,
+    source: cleanText(input.source, 20) === "nlp" ? "nlp" : "manual",
+    nlp_chapter: Number.isInteger(nlpChapter) && nlpChapter >= 1 && nlpChapter <= 17 ? nlpChapter : "",
+    nlp_classification: ["exclusivo", "compartilhado"].includes(cleanText(input.nlp_classification, 30).toLowerCase()) ? cleanText(input.nlp_classification, 30).toLowerCase() : ""
+  };
+}
 function normalizeState(value) {
   const source = value && typeof value === "object" ? value : {};
   return {
     removed: Array.isArray(source.removed) ? source.removed.slice(0, 10_000) : [],
     added: Array.isArray(source.added) ? source.added.slice(0, 10_000) : [],
+    book_relations: Array.isArray(source.book_relations) ? source.book_relations.slice(0, 10_000) : [],
     history: Array.isArray(source.history) ? source.history.slice(-MAX_HISTORY) : [],
     updated_at: source.updated_at || null
   };
@@ -94,6 +115,11 @@ function validateChange(input) {
     reviewer: cleanText(input.reviewer || input.item?.revisor || "Visitante", 120),
     changed_at: new Date().toISOString()
   };
+  if (type.startsWith("book_")) {
+    change.relation = cleanBookRelation(input.relation);
+    change.before = input.before ? cleanBookRelation(input.before) : null;
+    return change;
+  }
   if (type === "add") {
     change.item = cleanItem(input.item);
   } else if (type === "edit") {
@@ -111,6 +137,42 @@ function validateChange(input) {
 }
 
 function applyChange(state, change) {
+  if (change.type.startsWith("book_")) {
+    state.book_relations ||= [];
+    state.history ||= [];
+    const index = state.book_relations.findIndex(entry => entry.relation_id === change.relation.relation_id);
+    if (change.type === "book_add" && index >= 0) throw new Error("Esta relacao ja existe.");
+    const before = index >= 0 ? { ...state.book_relations[index] } : change.before;
+    if (change.type !== "book_add" && !before) throw new Error("Relacao do livro nao encontrada.");
+    const after = { ...(before || {}), ...change.relation };
+    if (change.type === "book_archive") after.active = false;
+    if (change.type === "book_restore") after.active = true;
+    after.reviewer = change.reviewer;
+    after.edited_at = change.changed_at;
+    if (index >= 0) state.book_relations[index] = after;
+    else state.book_relations.push(after);
+    const event = (type, oldValue, newValue) => ({
+      type,
+      reviewer: change.reviewer,
+      changed_at: change.changed_at,
+      relation_id: after.relation_id,
+      item_id: after.item_id,
+      chapter: after.chapter,
+      old_value: oldValue,
+      new_value: newValue
+    });
+    if (change.type === "book_add") state.history.push(event("book_add", "", `${after.chapter} | ${after.classification}`));
+    if (change.type === "book_archive") state.history.push(event("book_archive", "ativo", "arquivado"));
+    if (change.type === "book_restore") state.history.push(event("book_restore", "arquivado", "ativo"));
+    if (change.type === "book_update") {
+      if (Number(before.chapter) !== Number(after.chapter)) state.history.push(event("book_move", before.chapter, after.chapter));
+      if (before.classification !== after.classification) state.history.push(event("book_classify", before.classification, after.classification));
+      if ((before.observation || "") !== (after.observation || "")) state.history.push(event("book_observe", before.observation || "", after.observation || ""));
+    }
+    state.history = state.history.slice(-MAX_HISTORY);
+    state.updated_at = change.changed_at;
+    return state;
+  }
   if (change.type === "remove") {
     if (!state.removed.some(entry => idOf(entry) === change.manifestacao_id)) {
       state.removed.push(change);
@@ -201,7 +263,7 @@ async function writeRemote(change) {
       method: "PUT",
       headers: { ...githubHeaders(), "content-type": "application/json" },
       body: JSON.stringify({
-        message: `acervo: ${change.type} publicacao pela revisao aberta`,
+        message: change.type.startsWith("book_") ? `livro: ${change.type} pela curadoria aberta` : `acervo: ${change.type} publicacao pela revisao aberta`,
         content: Buffer.from(JSON.stringify(next, null, 2) + "\n", "utf8").toString("base64"),
         sha: current.sha,
         branch: BRANCH
@@ -233,7 +295,7 @@ export default async function handler(request) {
     return json(await writeRemote(change));
   } catch (error) {
     const message = error instanceof SyntaxError ? "JSON invalido." : error.message;
-    const status = /invalid|obrigatori|Informe|adicionada/.test(message) ? 400 : 502;
+    const status = /invalid|obrigatori|Informe|adicionada|Relacao|Capitulo|Classificacao|existe/.test(message) ? 400 : 502;
     return json({ error: message }, status);
   }
 }
