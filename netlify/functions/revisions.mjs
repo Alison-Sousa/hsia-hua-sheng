@@ -46,9 +46,17 @@ function cleanItem(input) {
     const limit = ["evidencia", "texto_ou_evidencia_disponivel"].includes(field) ? 5_000 : 1_000;
     item[field] = cleanText(input[field], limit);
   }
-  if (!item.fonte || !item.titulo || !item.categoria_painel) {
-    throw new Error("Fonte, titulo e formato sao obrigatorios.");
+  if (!item.fonte || !item.titulo || !item.categoria_painel || !item.data_publicacao) {
+    throw new Error("Fonte, titulo, formato e data sao obrigatorios.");
   }
+  const dateMatch = item.data_publicacao.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!dateMatch) throw new Error("Informe uma data valida no formato DD/MM/AAAA.");
+  const [, year, month, day] = dateMatch;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  if (date.getUTCFullYear() !== Number(year) || date.getUTCMonth() !== Number(month) - 1 || date.getUTCDate() !== Number(day)) {
+    throw new Error("Informe uma data valida no formato DD/MM/AAAA.");
+  }
+  item.ano = year;
   const address = item.url_original || item.url_principal;
   try {
     const parsed = new URL(address);
@@ -179,7 +187,7 @@ function githubHeaders() {
 async function readRemote() {
   const url = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE_PATH}?ref=${encodeURIComponent(BRANCH)}`;
   const response = await fetch(url, { headers: githubHeaders() });
-  if (!response.ok) throw new Error(`GitHub nao respondeu (${response.status}).`);
+  if (!response.ok) throw new Error(`Repositorio nao respondeu (${response.status}).`);
   const file = await response.json();
   const decoded = Buffer.from(String(file.content || "").replace(/\n/g, ""), "base64").toString("utf8");
   return { sha: file.sha, state: normalizeState(JSON.parse(decoded)) };
@@ -200,13 +208,13 @@ async function writeRemote(change) {
       })
     });
     if (response.ok) return next;
-    if (response.status !== 409) throw new Error(`GitHub recusou a alteracao (${response.status}).`);
+    if (response.status !== 409) throw new Error(`Repositorio recusou a alteracao (${response.status}).`);
   }
   throw new Error("Outra alteracao aconteceu ao mesmo tempo. Tente novamente.");
 }
 
 export default async function handler(request) {
-  if (!TOKEN) return json({ error: "Integracao com o GitHub ainda nao configurada no Netlify." }, 503);
+  if (!TOKEN) return json({ error: "Integracao com o repositorio ainda nao configurada no Netlify." }, 503);
   if (request.method === "GET") {
     try {
       const current = await readRemote();

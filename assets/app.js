@@ -16,7 +16,11 @@ const norm=v=>String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLo
 const safeUrl=v=>{try{const u=new URL(v);return ["http:","https:"].includes(u.protocol)?u.href:""}catch{return ""}};
 const state={data:null,revisions:{removed:[],added:[],history:[]},filters:{query:"",source:"",category:"",year:"",sort:"recent"},shown:PAGE_SIZE,sourceQuery:"",remote:false,syncError:""};
 function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove("show"),3200)}
-function fmtDate(value){if(!value)return "";const d=new Date(value.length===4?value+"-01-01":value+"T12:00:00");return Number.isNaN(+d)?value:new Intl.DateTimeFormat("pt-BR",{day:value.length===4?undefined:"2-digit",month:value.length===4?undefined:"short",year:"numeric"}).format(d)}
+function fmtDate(value){const raw=String(value??"").trim();if(/^\d{4}$/.test(raw))return raw;const iso=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);return iso?`${iso[3]}/${iso[2]}/${iso[1]}`:raw}
+function dateForForm(value){const raw=String(value??"").trim(),iso=raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);return iso?`${iso[3]}/${iso[2]}/${iso[1]}`:/^\d{2}\/\d{2}\/\d{4}$/.test(raw)?raw:""}
+function normalizeFormDate(value){const match=String(value??"").trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);if(!match)return "";const [,day,month,year]=match,date=new Date(Date.UTC(Number(year),Number(month)-1,Number(day)));return date.getUTCFullYear()===Number(year)&&date.getUTCMonth()===Number(month)-1&&date.getUTCDate()===Number(day)?`${year}-${month}-${day}`:""}
+function formValues(form){const values=Object.fromEntries(new FormData(form)),input=form.elements.namedItem("data_publicacao"),date=normalizeFormDate(values.data_publicacao);input.setCustomValidity(date?"":"Informe uma data válida no formato DD/MM/AAAA.");if(!date){input.reportValidity();return null}values.data_publicacao=date;values.ano=date.slice(0,4);return values}
+function maskDateInput(input){const digits=input.value.replace(/\D/g,"").slice(0,8);input.value=digits.length>4?`${digits.slice(0,2)}/${digits.slice(2,4)}/${digits.slice(4)}`:digits.length>2?`${digits.slice(0,2)}/${digits.slice(2)}`:digits}
 function statusLabel(value){return String(value||"").replaceAll("_"," ").replace(/^./,x=>x.toUpperCase())}
 function getId(item){return item.manifestacao_id||item.item_id}
 function isRemoved(item){return state.revisions.removed.some(x=>(x.manifestacao_id||x)===getId(item))}
@@ -90,7 +94,7 @@ function renderReview(){
  const rows=[...removed,...added];
  $("#changes-list").innerHTML=rows.length?rows.map(x=>`<div class="change-row"><div><strong>${x.type==="remove"?"Removido":x.type==="edit"?"Editado":"Adicionado"}: ${esc(x.title)}</strong><p>${esc(x.meta)}</p></div>${x.canRestore?`<button type="button" data-restore="${esc(x.id)}">Restaurar</button>`:""}</div>`).join(""):`<div class="empty"><strong>Nenhuma alteração publicada.</strong><span>A base compartilhada está sem revisões adicionais.</span></div>`;
  $$("[data-restore]").forEach(button=>button.onclick=()=>saveChange({type:"restore",manifestacao_id:button.dataset.restore}));
- $("#sync-status").textContent=state.remote?"Sincronização automática ativa. Toda alteração é publicada no GitHub.":`Sincronização indisponível. ${state.syncError||"As alterações ficam apenas neste navegador."}`;
+ $("#sync-status").textContent=state.remote?"Sincronização automática ativa. Toda alteração é publicada no repositório.":`Sincronização indisponível. ${state.syncError||"As alterações ficam apenas neste navegador."}`;
 }
 async function loadRevisions(){
  let local={removed:[],added:[],history:[]};try{local=JSON.parse(localStorage.getItem(LOCAL_KEY))||local}catch{}
@@ -111,23 +115,23 @@ function applyChange(target,change){
 }
 async function saveChange(change){
  const payload={...change,reviewer:change.item?.revisor||change.reviewer||"Visitante",changed_at:new Date().toISOString()};
- if(state.remote){try{const res=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)}),data=await res.json();if(!res.ok)throw Error(data.error||"Não foi possível publicar.");state.revisions=data;localStorage.setItem(LOCAL_KEY,JSON.stringify(data))}catch(error){toast(error.message||"Não foi possível publicar no GitHub.");return false}}
+ if(state.remote){try{const res=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)}),data=await res.json();if(!res.ok)throw Error(data.error||"Não foi possível publicar.");state.revisions=data;localStorage.setItem(LOCAL_KEY,JSON.stringify(data))}catch(error){toast(error.message||"Não foi possível publicar no repositório.");return false}}
  else{applyChange(state.revisions,payload);localStorage.setItem(LOCAL_KEY,JSON.stringify(state.revisions))}
  renderAll();toast(state.remote?"Alteração publicada. A base está sendo atualizada.":"Alteração salva apenas neste navegador.");return true;
 }
 async function toggleRemove(id){const item=findItem(id);if(!item)return;await saveChange({type:isRemoved(item)?"restore":"remove",manifestacao_id:id,item_id:item.item_id,titulo:item.titulo,fonte:item.fonte})}
 async function addItem(form){
- const values=Object.fromEntries(new FormData(form)),uid=crypto.randomUUID(),category=values.categoria_painel,role=["colunas_autorais","artigos_profissionais","artigos_academicos","livros_capitulos"].includes(category)?"autor_unico":category==="entrevistas_escritas_completas"?"entrevistado":"participante";
+ const values=formValues(form);if(!values)return;const uid=crypto.randomUUID(),category=values.categoria_painel,role=["colunas_autorais","artigos_profissionais","artigos_academicos","livros_capitulos"].includes(category)?"autor_unico":category==="entrevistas_escritas_completas"?"entrevistado":"participante";
  const item={...Object.fromEntries(FIELDS.map(x=>[x,""])),...values,manifestacao_id:`manifestacao-revisao-${uid}`,item_id:`hsia-revisao-${uid}`,producao_principal_item_id:`hsia-revisao-${uid}`,papel_manifestacao:"origem",tipo_manifestacao:category==="videos_podcasts"?"audiovisual":"escrita",papel_hsia:role,url_principal:values.url_original,status_verificacao:"confirmado_por_revisao",contabilizado_na_volumetria:"sim",status_acesso:"a_verificar",conteudo_status:"evidencia_fornecida",created_at:new Date().toISOString()};
  if(await saveChange({type:"add",item})){form.reset();activateTab("changes")}
 }
 function openEdit(id){
  const item=findItem(id);if(!item)return;const form=$("#edit-form");
- form.elements.original_id.value=id;for(const field of ["fonte","categoria_painel","titulo","autores","ano","url_original","evidencia","revisor"]){const input=form.elements.namedItem(field);if(input)input.value=item[field]||""}
+ form.elements.original_id.value=id;for(const field of ["fonte","categoria_painel","titulo","autores","url_original","evidencia","revisor"]){const input=form.elements.namedItem(field);if(input)input.value=item[field]||""}form.elements.data_publicacao.value=dateForForm(item.data_publicacao);
  $("#edit-dialog").showModal();
 }
 async function editItem(form){
- const values=Object.fromEntries(new FormData(form)),originalId=values.original_id,current=findItem(values.original_id);delete values.original_id;if(!current)return;
+ const values=formValues(form);if(!values)return;const originalId=values.original_id,current=findItem(values.original_id);delete values.original_id;if(!current)return;
  const category=values.categoria_painel,role=["colunas_autorais","artigos_profissionais","artigos_academicos","livros_capitulos"].includes(category)?"autor_unico":category==="entrevistas_escritas_completas"?"entrevistado":"participante";
  const item={...Object.fromEntries(FIELDS.map(x=>[x,""])),...current,...values,papel_hsia:role,tipo_manifestacao:category==="videos_podcasts"?"audiovisual":"escrita",url_principal:values.url_original,status_verificacao:"confirmado_por_revisao",contabilizado_na_volumetria:"sim"};
  if(await saveChange({type:"edit",manifestacao_id:originalId,item})){$("#edit-dialog").close();form.reset()}
@@ -136,40 +140,18 @@ function renderAll(){officialMeta();renderChart();renderMatrix();populateFilters
 function csvText(rows,fields=FIELDS){const q=v=>`"${String(v??"").replaceAll('"','""')}"`;return "\ufeff"+[fields,...rows.map(r=>fields.map(f=>r[f]??""))].map(r=>r.map(q).join(",")).join("\r\n")}
 function download(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1200)}
 function exportRows(){return activeItems().map(x=>{const row=Object.fromEntries(FIELDS.map(f=>[f,x[f]??""]));if(norm(row.autores).includes("desconhecid"))row.autores="";return row})}
-function volumeRows(){
- const c=counts(),base=Object.fromEntries(state.data.volumetria.map(x=>[x.fonte,x])),sources=[...new Set([...Object.keys(base),...Object.keys(c)])].sort((a,b)=>a.localeCompare(b,"pt-BR"));
- return sources.map(source=>{const row={fonte:source,forma_de_acesso:base[source]?.forma_de_acesso||"Link informado na revisão"};for(const key of Object.keys(CATEGORY_LABELS))row[key]=c[source]?.[key]||0;row.total_producoes_unicas=c[source]?.total||0;row.pendentes=base[source]?.pendentes||0;row.status_reconciliacao=base[source]?.status_reconciliacao||"incluido_por_revisao";return row})
-}
-function xml(v){return String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).slice(0,32767)}
-function column(n){let s="";while(n){n--;s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26)}return s}
-function sheetXml(rows){
- const keys=rows.length?Object.keys(rows[0]):["sem_dados"],all=[Object.fromEntries(keys.map(k=>[k,k])),...rows];
- return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${all.map((r,ri)=>`<row r="${ri+1}">${keys.map((k,ci)=>{const v=r[k]??"",ref=column(ci+1)+(ri+1);return typeof v==="number"?`<c r="${ref}"><v>${v}</v></c>`:`<c r="${ref}" t="inlineStr"${ri===0?' s="1"':""}><is><t>${xml(v)}</t></is></c>`}).join("")}</row>`).join("")}</sheetData><autoFilter ref="A1:${column(keys.length)}${all.length}"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews></worksheet>`;
-}
-const crcTable=(()=>{const t=[];for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
-function crc32(bytes){let c=0xffffffff;for(const b of bytes)c=crcTable[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0}
-function u16(v){return[v&255,v>>>8&255]}function u32(v){return[v&255,v>>>8&255,v>>>16&255,v>>>24&255]}
-function makeZip(files){
- const enc=new TextEncoder(),local=[],central=[];let offset=0;
- for(const [name,text] of Object.entries(files)){const n=enc.encode(name),d=enc.encode(text),crc=crc32(d),lh=new Uint8Array([80,75,3,4,20,0,0,8,0,0,0,0,0,0,...u32(crc),...u32(d.length),...u32(d.length),...u16(n.length),0,0,...n,...d]);local.push(lh);const ch=new Uint8Array([80,75,1,2,20,0,20,0,0,8,0,0,0,0,0,0,...u32(crc),...u32(d.length),...u32(d.length),...u16(n.length),0,0,0,0,0,0,0,0,0,0,0,0,...u32(offset),...n]);central.push(ch);offset+=lh.length}
- const csize=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array([80,75,5,6,0,0,0,0,...u16(local.length),...u16(local.length),...u32(csize),...u32(offset),0,0]);return new Blob([...local,...central,end],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-}
-function xlsxBlob(){
- const items=exportRows(),volumes=volumeRows(),history=state.revisions.history||[],names=["Publicações","Volumetria","Histórico"];
- return makeZip({"[Content_Types].xml":`<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${names.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`,
- "_rels/.rels":`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
- "xl/workbook.xml":`<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${names.map((n,i)=>`<sheet name="${n}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join("")}</sheets></workbook>`,
- "xl/_rels/workbook.xml.rels":`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${names.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join("")}<Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
- "xl/styles.xml":`<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0D2832"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border/></borders><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" applyFill="1" applyFont="1"/></cellXfs></styleSheet>`,
- "xl/worksheets/sheet1.xml":sheetXml(items),"xl/worksheets/sheet2.xml":sheetXml(volumes),"xl/worksheets/sheet3.xml":sheetXml(history.map(x=>({tipo:x.type,responsavel:x.reviewer,data:x.changed_at,item_id:x.item_id||x.item?.item_id,titulo:x.titulo||x.item?.titulo,fonte:x.fonte||x.item?.fonte})))});
-}
-function bind(){
+async function downloadOfficialXlsx(){
+ const button=$("#download-xlsx");button.disabled=true;
+ try{const response=await fetch(`data/acervo_hsia_atualizado.xlsx?v=${Date.now()}`,{cache:"no-store"});if(!response.ok)throw Error("Não foi possível baixar o XLSX.");const blob=await response.blob(),signature=new Uint8Array(await blob.slice(0,4).arrayBuffer());if(blob.size<10000||signature[0]!==80||signature[1]!==75)throw Error("O arquivo XLSX recebido é inválido.");download("acervo_hsia_atualizado.xlsx",blob)}
+ catch(error){toast(error.message||"Não foi possível baixar o XLSX.")}
+ finally{button.disabled=false}
+}function bind(){
  $("#source-search").oninput=e=>{state.sourceQuery=e.target.value;renderMatrix()};$("#query").oninput=e=>{state.filters.query=e.target.value;state.shown=PAGE_SIZE;renderCards()};
  [["#filter-source","source"],["#filter-category","category"],["#filter-year","year"],["#sort","sort"]].forEach(([s,k])=>$(s).onchange=e=>{state.filters[k]=e.target.value;state.shown=PAGE_SIZE;renderCards()});
  $("#clear-filters").onclick=()=>setFilters({query:"",source:"",category:"",year:"",sort:"recent"});$("#load-more").onclick=()=>{state.shown+=PAGE_SIZE;renderCards()};
  ["#open-review","#open-review-bottom"].forEach(s=>$(s).onclick=()=>{$("#review-dialog").showModal();renderReview()});$$("[data-close]").forEach(b=>b.onclick=()=>$("#"+b.dataset.close).close());
- $$(".review-tabs button").forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));$("#add-form").onsubmit=e=>{e.preventDefault();addItem(e.currentTarget)};$("#edit-form").onsubmit=e=>{e.preventDefault();editItem(e.currentTarget)};
- $("#download-csv").onclick=()=>download("painel_itens_atualizado.csv",new Blob([csvText(exportRows())],{type:"text/csv;charset=utf-8"}));$("#download-xlsx").onclick=()=>download("acervo_hsia_atualizado.xlsx",xlsxBlob());
+ $$(".review-tabs button").forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));$("#add-form").onsubmit=e=>{e.preventDefault();addItem(e.currentTarget)};$("#edit-form").onsubmit=e=>{e.preventDefault();editItem(e.currentTarget)};$$('input[name="data_publicacao"]').forEach(input=>input.oninput=()=>{input.setCustomValidity("");maskDateInput(input)});
+ $("#download-csv").onclick=()=>download("painel_itens_atualizado.csv",new Blob([csvText(exportRows())],{type:"text/csv;charset=utf-8"}));$("#download-xlsx").onclick=downloadOfficialXlsx;
 }async function init(){
  try{const res=await fetch("data/dashboard.json",{cache:"no-store"});if(!res.ok)throw Error(`HTTP ${res.status}`);state.data=await res.json();await loadRevisions();bind();renderAll()}
  catch(error){document.body.innerHTML=`<main class="fatal"><h1>Não foi possível abrir o acervo.</h1><p>${esc(error.message)}</p><p>Gere <code>data/dashboard.json</code> antes de publicar.</p></main>`}

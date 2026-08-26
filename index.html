@@ -145,7 +145,7 @@
         <label><span>Formato *</span><select name="categoria_painel" required></select></label>
         <label class="full"><span>Título *</span><input name="titulo" required></label>
         <label><span>Autoria, repórter ou produção</span><input name="autores" placeholder="Nome confirmado na página"></label>
-        <label><span>Ano</span><input name="ano" inputmode="numeric" pattern="[0-9]{4}" placeholder="2025"></label>
+        <label><span>Data *</span><input name="data_publicacao" inputmode="numeric" autocomplete="off" required pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" maxlength="10" placeholder="DD/MM/AAAA" title="Informe a data no formato DD/MM/AAAA"></label>
         <label class="full"><span>URL original *</span><input name="url_original" type="url" required placeholder="https://…"></label>
         <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3" placeholder="Explique onde Hsia aparece e por que o registro deve entrar."></textarea></label>
         <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico da revisão"></label>
@@ -169,7 +169,7 @@
       <label><span>Formato *</span><select name="categoria_painel" required></select></label>
       <label class="full"><span>Título *</span><input name="titulo" required></label>
       <label><span>Autoria, repórter ou produção</span><input name="autores"></label>
-      <label><span>Ano</span><input name="ano" inputmode="numeric" pattern="[0-9]{4}"></label>
+      <label><span>Data *</span><input name="data_publicacao" inputmode="numeric" autocomplete="off" required pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" maxlength="10" placeholder="DD/MM/AAAA" title="Informe a data no formato DD/MM/AAAA"></label>
       <label class="full"><span>URL original *</span><input name="url_original" type="url" required></label>
       <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3"></textarea></label>
       <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico"></label>
