@@ -82,6 +82,8 @@ function cleanBookRelation(input) {
     item_id: cleanText(input.item_id, 240),
     chapter,
     classification,
+    justification: cleanText(input.justification, 5_000),
+    contribution: cleanText(input.contribution, 5_000),
     observation: cleanText(input.observation, 5_000),
     active: input.active !== false,
     source: cleanText(input.source, 20) === "nlp" ? "nlp" : "manual",
@@ -202,6 +204,8 @@ function applyChange(state, change) {
     if (change.type === "book_update") {
       if (Number(before.chapter) !== Number(after.chapter)) state.history.push(event("book_move", before.chapter, after.chapter));
       if (before.classification !== after.classification) state.history.push(event("book_classify", before.classification, after.classification));
+      if ((before.justification || "") !== (after.justification || "")) state.history.push(event("book_relevance", before.justification || "", after.justification || ""));
+      if ((before.contribution || "") !== (after.contribution || "")) state.history.push(event("book_contribution", before.contribution || "", after.contribution || ""));
       if ((before.observation || "") !== (after.observation || "")) state.history.push(event("book_observe", before.observation || "", after.observation || ""));
     }
     state.history = state.history.slice(-MAX_HISTORY);

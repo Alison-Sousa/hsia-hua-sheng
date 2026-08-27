@@ -6,7 +6,7 @@ const $=(selector,root=document)=>root.querySelector(selector),$$=(selector,root
 const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const norm=value=>String(value??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
 const human=value=>String(value||"Não informado").replaceAll("_"," ").replace(/^./,letter=>letter.toUpperCase());
-const state={data:null,baseItems:null,overrides:[],remote:false,selectedItems:new Set(),filters:{chapter:"",classification:"",type:"",adherence:0,update:"",query:"",sort:"adherence"}};
+const state={data:null,baseItems:null,overrides:[],remote:false,selectedItems:new Set(),filters:{chapter:"",classification:"",type:"",adherence:0,update:"",sort:"adherence"}};
 
 function toast(message){const element=$("#toast");element.textContent=message;element.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>element.classList.remove("show"),3500)}
 function localPublicationRevisions(){try{return JSON.parse(localStorage.getItem("hsia-dashboard-revisions-v2"))||{}}catch{return {}}}
@@ -30,7 +30,7 @@ function currentRelations(){
 }
 function updatesFor(relation){return state.data.updates.filter(update=>update.item_id===relation.item_id&&Number(update.chapter)===Number(relation.chapter))}
 function activeChaptersForItem(itemId){return [...new Set(currentRelations().filter(relation=>relation.active!==false&&relation.item_id===itemId).map(relation=>Number(relation.chapter)))].sort((a,b)=>a-b)}
-function relationPayload(relation,changes={}){return {relation_id:relation.relation_id,item_id:relation.item_id,chapter:Number(relation.chapter),classification:relation.classification,observation:relation.observation||"",active:relation.active!==false,source:relation.source||"nlp",nlp_chapter:relation.nlp_chapter||"",nlp_classification:relation.nlp_classification||"",...changes}}
+function relationPayload(relation,changes={}){return {relation_id:relation.relation_id,item_id:relation.item_id,chapter:Number(relation.chapter),classification:relation.classification,justification:relation.justification||"",contribution:relation.contribution||"",observation:relation.observation||"",active:relation.active!==false,source:relation.source||"nlp",nlp_chapter:relation.nlp_chapter||"",nlp_classification:relation.nlp_classification||"",...changes}}
 function findRelation(id){return currentRelations().find(relation=>relation.relation_id===id)}
 function emptyList(message){return `<div class="book-empty">${esc(message)}</div>`}
 
@@ -60,7 +60,6 @@ function matchesFilters(relation){
  if(Number(relation.adherence||0)<Number(filter.adherence||0))return false;
  if(filter.update==="yes"&&!hasUpdates)return false;
  if(filter.update==="no"&&hasUpdates)return false;
- if(filter.query&&!norm(`${item.title} ${item.source}`).includes(norm(filter.query)))return false;
  return true;
 }
 function sortRelations(relations){
@@ -95,6 +94,13 @@ function renderWorkspace(){
  $$('[data-book-restore]',workspace).forEach(button=>button.onclick=()=>restoreRelation(button.dataset.bookRestore));
 }
 function renderAll(){renderSummary();renderParts();renderWorkspace()}
+function publicRelationsForItem(itemId){
+ return sortRelations(currentRelations().filter(relation=>relation.active!==false&&relation.item_id===itemId)).map(relation=>({...relation,chapter_title:chapterById(relation.chapter)?.title||""}));
+}
+function publishBridge(){
+ window.HsiaBook={relationsForItem:publicRelationsForItem,editRelation:openEdit,openChapter:id=>openChapter(id,true)};
+ window.dispatchEvent(new CustomEvent("hsia-book-ready"));
+}
 function openChapter(id,scroll=false){state.filters.chapter=String(id);$("#book-filter-chapter").value=state.filters.chapter;renderParts();renderWorkspace();if(scroll)$("#book-workspace").scrollIntoView({behavior:"smooth",block:"start"})}
 
 function openUpdates(id){
@@ -103,18 +109,18 @@ function openUpdates(id){
  $("#book-updates-dialog").showModal();
 }
 function openEdit(id){
- const relation=findRelation(id);if(!relation)return;const form=$("#book-edit-form");form.elements.relation_id.value=id;form.elements.chapter.value=relation.chapter;form.elements.classification.value=relation.classification;form.elements.observation.value=relation.observation||"";form.elements.reviewer.value="";$("#book-restore-nlp").hidden=relation.source!=="nlp";$("#book-edit-dialog").showModal();
+ const relation=findRelation(id);if(!relation)return;const form=$("#book-edit-form");form.elements.relation_id.value=id;form.elements.chapter.value=relation.chapter;form.elements.classification.value=relation.classification;form.elements.justification.value=relation.justification||"";form.elements.contribution.value=relation.contribution||"";form.elements.observation.value=relation.observation||"";form.elements.reviewer.value="";$("#book-restore-nlp").hidden=relation.source!=="nlp";$("#book-edit-dialog").showModal();
 }
 function duplicateRelation(itemId,chapter,exceptId=""){return currentRelations().find(relation=>relation.relation_id!==exceptId&&relation.item_id===itemId&&Number(relation.chapter)===Number(chapter))}
 async function saveBookChange(type,relation,before,reviewer){
  const payload={type,relation,before,reviewer:reviewer||"Visitante"};
  if(state.remote){try{const response=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)}),data=await response.json();if(!response.ok)throw Error(data.error||"Não foi possível salvar a curadoria.");state.overrides=data.book_relations||[]}catch(error){toast(error.message||"Não foi possível salvar a curadoria no repositório.");return false}}
  else{const index=state.overrides.findIndex(entry=>entry.relation_id===relation.relation_id),next={...(index>=0?state.overrides[index]:before||{}),...relation,reviewer:reviewer||"Visitante",edited_at:new Date().toISOString()};if(index>=0)state.overrides[index]=next;else state.overrides.push(next);localStorage.setItem(LOCAL_KEY,JSON.stringify(state.overrides))}
- renderAll();toast(state.remote?"Decisão editorial publicada no repositório.":"Decisão salva neste navegador.");return true;
+ renderAll();publishBridge();toast(state.remote?"Decisão editorial publicada no repositório.":"Decisão salva neste navegador.");return true;
 }
 async function submitEdit(form){
- const before=findRelation(form.elements.relation_id.value);if(!before)return;const chapter=Number(form.elements.chapter.value),classification=form.elements.classification.value,observation=form.elements.observation.value.trim(),duplicate=duplicateRelation(before.item_id,chapter,before.relation_id);if(duplicate&&duplicate.active!==false){toast("Esta obra já está ativa nesse capítulo.");return}
- const after=relationPayload(before,{chapter,classification,observation});if(Number(before.chapter)===chapter&&before.classification===classification&&(before.observation||"")===observation){toast("Nenhuma mudança para salvar.");return}
+ const before=findRelation(form.elements.relation_id.value);if(!before)return;const chapter=Number(form.elements.chapter.value),classification=form.elements.classification.value,justification=form.elements.justification.value.trim(),contribution=form.elements.contribution.value.trim(),observation=form.elements.observation.value.trim(),duplicate=duplicateRelation(before.item_id,chapter,before.relation_id);if(duplicate&&duplicate.active!==false){toast("Esta obra já está ativa nesse capítulo.");return}
+ const after=relationPayload(before,{chapter,classification,justification,contribution,observation});if(Number(before.chapter)===chapter&&before.classification===classification&&(before.justification||"")===justification&&(before.contribution||"")===contribution&&(before.observation||"")===observation){toast("Nenhuma mudança para salvar.");return}
  if(await saveBookChange("book_update",after,relationPayload(before),form.elements.reviewer.value.trim()))$("#book-edit-dialog").close();
 }
 async function archiveCurrent(){const form=$("#book-edit-form"),before=findRelation(form.elements.relation_id.value);if(!before)return;const after=relationPayload(before,{active:false});if(await saveBookChange("book_archive",after,relationPayload(before),form.elements.reviewer.value.trim()))$("#book-edit-dialog").close()}
@@ -136,21 +142,21 @@ async function openAdd(){
 async function saveBookAdditions(relations,reviewer,skipped=0){
  if(state.remote){try{const response=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({type:"book_add_many",relations,reviewer:reviewer||"Visitante"})}),data=await response.json();if(!response.ok)throw Error(data.error||"Não foi possível adicionar as obras.");state.overrides=data.book_relations||[]}catch(error){toast(error.message||"Não foi possível salvar a curadoria no repositório.");return false}}
  else{const editedAt=new Date().toISOString();for(const relation of relations)state.overrides.push({...relation,reviewer:reviewer||"Visitante",edited_at:editedAt});localStorage.setItem(LOCAL_KEY,JSON.stringify(state.overrides))}
- renderAll();const suffix=skipped?` ${skipped} ${skipped===1?"obra já estava":"obras já estavam"} no capítulo e não foram repetidas.`:"";toast(`${relations.length} ${relations.length===1?"obra adicionada":"obras adicionadas"}.${suffix}`);return true;
+ renderAll();publishBridge();const suffix=skipped?` ${skipped} ${skipped===1?"obra já estava":"obras já estavam"} no capítulo e não foram repetidas.`:"";toast(`${relations.length} ${relations.length===1?"obra adicionada":"obras adicionadas"}.${suffix}`);return true;
 }
 async function submitAdd(form){
  const chapter=Number(form.elements.chapter.value),selected=[...state.selectedItems].filter(itemId=>state.data.items[itemId]);if(!selected.length){toast("Marque pelo menos uma obra na lista.");return}const eligible=selected.filter(itemId=>!duplicateRelation(itemId,chapter)),skipped=selected.length-eligible.length;if(!eligible.length){toast("As obras selecionadas já estão ligadas a este capítulo.");renderAddSearch();return}
- const classification=form.elements.classification.value,observation=form.elements.observation.value.trim(),relations=eligible.map(itemId=>({relation_id:`manual:${crypto.randomUUID()}`,item_id:itemId,chapter,classification,observation,active:true,source:"manual",nlp_chapter:"",nlp_classification:""})),submit=$("#book-add-submit");submit.disabled=true;submit.textContent="Salvando…";const saved=await saveBookAdditions(relations,form.elements.reviewer.value.trim(),skipped);if(saved){$("#book-add-dialog").close();openChapter(chapter,true)}else renderSelectedAddItems();
+ const classification=form.elements.classification.value,observation=form.elements.observation.value.trim(),relations=eligible.map(itemId=>({relation_id:`manual:${crypto.randomUUID()}`,item_id:itemId,chapter,classification,justification:"",contribution:"",observation,active:true,source:"manual",nlp_chapter:"",nlp_classification:""})),submit=$("#book-add-submit");submit.disabled=true;submit.textContent="Salvando…";const saved=await saveBookAdditions(relations,form.elements.reviewer.value.trim(),skipped);if(saved){$("#book-add-dialog").close();openChapter(chapter,true)}else renderSelectedAddItems();
 }
 function bind(){
  const filterMap={"#book-filter-classification":"classification","#book-filter-type":"type","#book-filter-adherence":"adherence","#book-filter-update":"update","#book-filter-sort":"sort"};
  Object.entries(filterMap).forEach(([selector,key])=>$(selector).onchange=event=>{state.filters[key]=event.target.value;renderWorkspace()});
- $("#book-filter-query").oninput=event=>{state.filters.query=event.target.value;renderWorkspace()};$("#book-filter-chapter").onchange=event=>{state.filters.chapter=event.target.value;renderParts();renderWorkspace()};
- $("#book-clear-filters").onclick=()=>{Object.assign(state.filters,{chapter:"",classification:"",type:"",adherence:0,update:"",query:"",sort:"adherence"});for(const id of ["#book-filter-chapter","#book-filter-classification","#book-filter-type","#book-filter-update"])$(id).value="";$("#book-filter-adherence").value="0";$("#book-filter-sort").value="adherence";$("#book-filter-query").value="";renderParts();renderWorkspace()};
+$("#book-filter-chapter").onchange=event=>{state.filters.chapter=event.target.value;renderParts();renderWorkspace()};
+ $("#book-clear-filters").onclick=()=>{Object.assign(state.filters,{chapter:"",classification:"",type:"",adherence:0,update:"",sort:"adherence"});for(const id of ["#book-filter-chapter","#book-filter-classification","#book-filter-type","#book-filter-update"])$(id).value="";$("#book-filter-adherence").value="0";$("#book-filter-sort").value="adherence";renderParts();renderWorkspace()};
  $("#book-open-add").onclick=openAdd;$("#book-edit-form").onsubmit=event=>{event.preventDefault();submitEdit(event.currentTarget)};$("#book-archive-relation").onclick=archiveCurrent;$("#book-restore-nlp").onclick=()=>{const form=$("#book-edit-form"),relation=findRelation(form.elements.relation_id.value);if(!relation||relation.source!=="nlp")return;form.elements.chapter.value=relation.nlp_chapter;form.elements.classification.value=relation.nlp_classification;toast("Sugestão inicial recuperada. Clique em Salvar decisão.")};$("#book-add-form").onsubmit=event=>{event.preventDefault();submitAdd(event.currentTarget)};$("#book-add-search").oninput=renderAddSearch;$('#book-add-form [name="chapter"]').onchange=renderAddSearch; $$('[data-book-close]').forEach(button=>button.onclick=()=>$("#"+button.dataset.bookClose).close());
 }
 async function init(){
- try{const response=await fetch("data/livro.json",{cache:"no-store"});if(!response.ok)throw Error(`HTTP ${response.status}`);state.data=await response.json();state.baseItems={...state.data.items};await refreshRevisionData();populateControls();bind();renderAll();$("#book-loading").hidden=true;$("#book-content").hidden=false
+ try{const response=await fetch("data/livro.json",{cache:"no-store"});if(!response.ok)throw Error(`HTTP ${response.status}`);state.data=await response.json();state.baseItems={...state.data.items};await refreshRevisionData();populateControls();bind();renderAll();publishBridge();$("#book-loading").hidden=true;$("#book-content").hidden=false
  }catch(error){$("#book-loading").textContent="Não foi possível carregar a curadoria do livro.";console.error(error)}
 }init();
 })();

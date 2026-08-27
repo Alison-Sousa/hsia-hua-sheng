@@ -185,7 +185,7 @@ def resolve_book_relations(book: dict[str, Any], revisions: dict[str, Any]) -> l
             continue
         if relation_id in by_id:
             target = by_id[relation_id]
-            for field in ("chapter", "classification", "observation", "active", "source", "nlp_chapter", "nlp_classification", "reviewer", "edited_at"):
+            for field in ("chapter", "classification", "justification", "contribution", "observation", "active", "source", "nlp_chapter", "nlp_classification", "reviewer", "edited_at"):
                 if field in raw:
                     target[field] = raw[field]
         else:
@@ -204,8 +204,8 @@ def resolve_book_relations(book: dict[str, Any], revisions: dict[str, Any]) -> l
                 "nlp_classification": raw.get("nlp_classification", ""),
                 "adherence": 0.0,
                 "ranking": 0,
-                "justification": "",
-                "contribution": "",
+                "justification": raw.get("justification", ""),
+                "contribution": raw.get("contribution", ""),
                 "reviewer": raw.get("reviewer", ""),
                 "edited_at": raw.get("edited_at", ""),
             }

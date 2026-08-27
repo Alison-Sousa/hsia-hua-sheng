@@ -68,23 +68,39 @@ function filtered(){
  if(f.query){const q=norm(f.query);items=items.filter(x=>norm([x.titulo,x.fonte,x.credito_exibicao,x.participacao_hsia,x.item_id,x.evidencia].join(" ")).includes(q))}
  const coll=new Intl.Collator("pt-BR",{sensitivity:"base"});items.sort((a,b)=>f.sort==="oldest"?(a.ano||9999)-(b.ano||9999):f.sort==="source"?coll.compare(a.fonte,b.fonte):f.sort==="title"?coll.compare(a.titulo,b.titulo):(b.ano||0)-(a.ano||0)||coll.compare(a.titulo,b.titulo));return items;
 }
+function bookRelationsFor(item){
+ const bridge=window.HsiaBook;if(!bridge||typeof bridge.relationsForItem!=="function"||!item.item_id)return [];
+ try{return bridge.relationsForItem(item.item_id)}catch{return []}
+}
+function bookRelationMeta(relation){
+ const score=Number(relation.adherence||0),scoreLabel=score>0?score.toFixed(1).replace(".",",")+"% de aderência":"Sem percentual de aderência";
+ return scoreLabel+" · "+(relation.classification==="exclusivo"?"Exclusivo":"Compartilhado");
+}
+function publicationBookHTML(item,compact=false){
+ const relations=bookRelationsFor(item);if(!relations.length)return "";
+ const rows=relations.map(relation=>'<button class="publication-book-relation" type="button" data-publication-book-relation="'+esc(relation.relation_id)+'"><strong>Cap. '+esc(relation.chapter)+(relation.chapter_title?" · "+esc(relation.chapter_title):"")+'</strong><span>'+esc(bookRelationMeta(relation))+'</span><small>Editar relação</small></button>').join("");
+ return '<section class="publication-book'+(compact?" compact":"")+'"><div class="publication-book-head"><span>No Livro</span><b>'+relations.length+' '+(relations.length===1?"capítulo":"capítulos")+'</b></div><div class="publication-book-list">'+rows+'</div></section>';
+}
+function bindBookRelationButtons(root=document){
+ [...root.querySelectorAll("[data-publication-book-relation]")].forEach(button=>button.onclick=()=>{const relationId=button.dataset.publicationBookRelation,dialog=button.closest("dialog");if(dialog?.open)dialog.close();window.HsiaBook?.editRelation(relationId)});
+}
 function cardHTML(item){
  const id=getId(item),removed=isRemoved(item),url=safeUrl(item.url_original||item.url_principal),year=item.ano||String(item.data_publicacao||"").slice(0,4)||"s.d.";
- return `<article class="card ${removed?"removed":""}" data-id="${esc(id)}"><div class="card-top"><span class="category-tag">${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</span><span class="card-year">${esc(year)}</span></div><h3>${esc(item.titulo||"Título não informado")}</h3><p class="card-source">${esc(item.fonte)}</p><div class="credit"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong><div class="participation">${esc(item.participacao_hsia)}</div></div><div class="card-actions"><button class="open-detail" data-id="${esc(id)}" type="button">Ver detalhes</button>${url?`<a class="source-link" href="${esc(url)}" target="_blank" rel="noopener">Abrir origem</a>`:""}<button class="review-action" data-id="${esc(id)}" title="${removed?"Restaurar":"Marcar para remover"}" aria-label="${removed?"Restaurar":"Marcar para remover"}">${removed?"↶":"−"}</button></div></article>`;
+ return `<article class="card ${removed?"removed":""}" data-id="${esc(id)}"><div class="card-top"><span class="category-tag">${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</span><span class="card-year">${esc(year)}</span></div><h3>${esc(item.titulo||"Título não informado")}</h3><p class="card-source">${esc(item.fonte)}</p><div class="credit"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong><div class="participation">${esc(item.participacao_hsia)}</div></div>${publicationBookHTML(item,true)}<div class="card-actions"><button class="open-detail" data-id="${esc(id)}" type="button">Ver detalhes</button>${url?`<a class="source-link" href="${esc(url)}" target="_blank" rel="noopener">Abrir origem</a>`:""}<button class="review-action" data-id="${esc(id)}" title="${removed?"Restaurar":"Marcar para remover"}" aria-label="${removed?"Restaurar":"Marcar para remover"}">${removed?"↶":"−"}</button></div></article>`;
 }
 function renderCards(){
  const items=filtered(),shown=items.slice(0,state.shown),f=state.filters;$("#results-title").textContent=f.source&&f.category?`${CATEGORY_LABELS[f.category]} — ${f.source}`:f.source?f.source:f.category?CATEGORY_LABELS[f.category]:"Todos os registros";
  $("#results-summary").textContent=`${items.length.toLocaleString("pt-BR")} ${items.length===1?"registro encontrado":"registros encontrados"} na base atualizada.`;
  const context=$("#active-context");context.hidden=!(f.source||f.category);context.innerHTML=(f.source||f.category)?`Recorte ativo: <strong>${esc([f.source,CATEGORY_LABELS[f.category]].filter(Boolean).join(" · "))}</strong>`:"";
  $("#cards").innerHTML=shown.map(cardHTML).join("");$("#empty").hidden=items.length>0;$("#load-more").hidden=shown.length>=items.length;
- $$(".open-detail").forEach(b=>b.onclick=()=>openDetail(b.dataset.id));$$(".review-action").forEach(b=>b.onclick=()=>toggleRemove(b.dataset.id));
+ $$(".open-detail").forEach(b=>b.onclick=()=>openDetail(b.dataset.id));$$(".review-action").forEach(b=>b.onclick=()=>toggleRemove(b.dataset.id));bindBookRelationButtons($("#cards"));
 }
 function findItem(id){return [...state.data.itens,...state.revisions.added.map(enrichAdded)].find(x=>getId(x)===id)}
 function openDetail(id){
  const item=findItem(id);if(!item)return;$("#detail-title").textContent=item.titulo||"Publicação";
  const links=[item.url_original,item.url_principal,...(item.urls_secundarias_lista||[])].map(safeUrl).filter((x,i,a)=>x&&a.indexOf(x)===i);
- $("#detail-body").innerHTML=`<div class="detail-grid"><div class="detail-field"><span>Fonte</span><strong>${esc(item.fonte)}</strong></div><div class="detail-field"><span>Formato</span><strong>${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</strong></div><div class="detail-field"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong></div><div class="detail-field"><span>Papel de Hsia</span><strong>${esc(item.participacao_hsia)}</strong></div><div class="detail-field"><span>Data</span><strong>${esc(fmtDate(item.data_publicacao||item.ano)||"Não informada")}</strong></div><div class="detail-field"><span>Identificador</span><strong>${esc(item.item_id||"Em revisão")}</strong></div><div class="detail-field full"><span>Evidência preservada</span><p>${esc(item.evidencia||item.texto_ou_evidencia_disponivel||"Metadados e link original preservados.")}</p></div><div class="detail-field full"><span>Links</span><div class="detail-links">${links.length?links.map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${i?"Fonte secundária":"Publicação original"} ↗</a>`).join(""):"Nenhum endereço disponível"}</div></div></div><div class="detail-actions"><button class="button dark" data-detail-edit="${esc(id)}">Editar publicação</button><button class="button subtle detail-remove" data-detail-remove="${esc(id)}">${isRemoved(item)?"Restaurar registro":"Marcar para remoção"}</button></div>`;
- $("[data-detail-edit]").onclick=()=>{$("#detail-dialog").close();openEdit(id)};$("[data-detail-remove]").onclick=async()=>{await toggleRemove(id);$("#detail-dialog").close()};$("#detail-dialog").showModal();
+ $("#detail-body").innerHTML=`<div class="detail-grid"><div class="detail-field"><span>Fonte</span><strong>${esc(item.fonte)}</strong></div><div class="detail-field"><span>Formato</span><strong>${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</strong></div><div class="detail-field"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong></div><div class="detail-field"><span>Papel de Hsia</span><strong>${esc(item.participacao_hsia)}</strong></div><div class="detail-field"><span>Data</span><strong>${esc(fmtDate(item.data_publicacao||item.ano)||"Não informada")}</strong></div><div class="detail-field"><span>Identificador</span><strong>${esc(item.item_id||"Em revisão")}</strong></div><div class="detail-field full"><span>Evidência preservada</span><p>${esc(item.evidencia||item.texto_ou_evidencia_disponivel||"Metadados e link original preservados.")}</p></div><div class="detail-field full"><span>Links</span><div class="detail-links">${links.length?links.map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${i?"Fonte secundária":"Publicação original"} ↗</a>`).join(""):"Nenhum endereço disponível"}</div></div></div>${publicationBookHTML(item)}<div class="detail-actions"><button class="button dark" data-detail-edit="${esc(id)}">Editar publicação</button><button class="button subtle detail-remove" data-detail-remove="${esc(id)}">${isRemoved(item)?"Restaurar registro":"Marcar para remoção"}</button></div>`;
+ bindBookRelationButtons($("#detail-body"));$("[data-detail-edit]").onclick=()=>{$("#detail-dialog").close();openEdit(id)};$("[data-detail-remove]").onclick=async()=>{await toggleRemove(id);$("#detail-dialog").close()};$("#detail-dialog").showModal();
 }
 function setFilters(next){Object.assign(state.filters,next);state.shown=PAGE_SIZE;$("#query").value=state.filters.query||"";$("#filter-source").value=state.filters.source||"";$("#filter-category").value=state.filters.category||"";$("#filter-year").value=state.filters.year||"";renderCards();$("#publicacoes").scrollIntoView({behavior:"smooth"})}
 function renderReview(){
@@ -127,7 +143,7 @@ async function addItem(form){
 }
 function openEdit(id){
  const item=findItem(id);if(!item)return;const form=$("#edit-form");
- form.elements.original_id.value=id;for(const field of ["fonte","categoria_painel","titulo","autores","url_original","evidencia","revisor"]){const input=form.elements.namedItem(field);if(input)input.value=item[field]||""}form.elements.data_publicacao.value=dateForForm(item.data_publicacao);
+ form.elements.original_id.value=id;for(const field of ["fonte","categoria_painel","titulo","autores","url_original","evidencia","revisor"]){const input=form.elements.namedItem(field);if(input)input.value=item[field]||""}form.elements.data_publicacao.value=dateForForm(item.data_publicacao);const bookBox=$("#edit-book-relations"),bookHtml=publicationBookHTML(item);bookBox.hidden=!bookHtml;bookBox.innerHTML=bookHtml;if(bookHtml)bindBookRelationButtons(bookBox);
  $("#edit-dialog").showModal();
 }
 async function editItem(form){
@@ -156,5 +172,6 @@ async function downloadOfficialXlsx(){
  try{const res=await fetch("data/dashboard.json",{cache:"no-store"});if(!res.ok)throw Error(`HTTP ${res.status}`);state.data=await res.json();await loadRevisions();bind();renderAll()}
  catch(error){document.body.innerHTML=`<main class="fatal"><h1>Não foi possível abrir o acervo.</h1><p>${esc(error.message)}</p><p>Gere <code>data/dashboard.json</code> antes de publicar.</p></main>`}
 }
+window.addEventListener("hsia-book-ready",()=>{if(state.data)renderCards()});
 init();
 })();

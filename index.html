@@ -160,7 +160,6 @@
         <div id="book-loading" class="book-loading">Organizando capítulos e obras…</div>
         <div id="book-content" hidden>
           <div class="book-toolbar" aria-label="Filtros do Livro">
-            <label class="book-search"><span>Buscar obra</span><input id="book-filter-query" type="search" placeholder="Título ou fonte" autocomplete="off"></label>
             <label><span>Capítulo</span><select id="book-filter-chapter"><option value="">Escolha um capítulo</option></select></label>
             <label><span>Relação</span><select id="book-filter-classification"><option value="">Todas</option><option value="exclusivo">Exclusivos</option><option value="compartilhado">Compartilhados</option></select></label>
             <label><span>Tipo</span><select id="book-filter-type"><option value="">Todos</option></select></label>
@@ -257,6 +256,7 @@
       <label><span>Data *</span><input name="data_publicacao" inputmode="numeric" autocomplete="off" required pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" maxlength="10" placeholder="DD/MM/AAAA" title="Informe a data no formato DD/MM/AAAA"></label>
       <label class="full"><span>URL original *</span><input name="url_original" type="url" required></label>
       <label class="full"><span>Evidência</span><textarea name="evidencia" rows="3"></textarea></label>
+      <div id="edit-book-relations" class="edit-book-relations full" hidden></div>
       <label><span>Seu nome</span><input name="revisor" placeholder="Para o histórico"></label>
       <button class="button primary full" type="submit">Salvar e publicar alteração</button>
     </form>
@@ -272,6 +272,8 @@
       <input name="relation_id" type="hidden">
       <label><span>Capítulo</span><select name="chapter" required></select></label>
       <label><span>Relação atual</span><select name="classification" required><option value="exclusivo">Exclusivo</option><option value="compartilhado">Compartilhado</option></select></label>
+      <label class="full"><span>Relevância</span><textarea name="justification" rows="4" placeholder="Explique por que a obra é importante para este capítulo."></textarea></label>
+      <label class="full"><span>Contribuição para a pergunta</span><textarea name="contribution" rows="4" placeholder="Explique como a obra ajuda a responder à pergunta do capítulo."></textarea></label>
       <label class="full"><span>Observação editorial</span><textarea name="observation" rows="4" placeholder="Registre aqui a decisão ou o ponto que merece atenção."></textarea></label>
       <label class="full"><span>Seu nome</span><input name="reviewer" placeholder="Para o histórico da curadoria"></label>
       <div class="book-form-actions full"><button class="button subtle book-archive-button" id="book-archive-relation" type="button">Arquivar relação</button><button class="button subtle" id="book-restore-nlp" type="button">Restaurar sugestão inicial</button><button class="button primary" type="submit">Salvar decisão</button></div>
