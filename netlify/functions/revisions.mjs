@@ -7,7 +7,7 @@ const FILE_PATH = "data/revisoes_aprovadas.json";
 const TOKEN = process.env.GITHUB_TOKEN;
 const MAX_BODY_BYTES = 250_000;
 const MAX_HISTORY = 2_000;
-const ALLOWED_TYPES = new Set(["add", "edit", "remove", "restore", "book_add", "book_update", "book_archive", "book_restore"]);
+const ALLOWED_TYPES = new Set(["add", "edit", "remove", "restore", "book_add", "book_add_many", "book_update", "book_archive", "book_restore"]);
 const ITEM_FIELDS = [
   "fonte", "categoria_painel", "manifestacao_id", "item_id",
   "producao_principal_item_id", "manifestacao_derivada_de_item_id",
@@ -115,6 +115,18 @@ function validateChange(input) {
     reviewer: cleanText(input.reviewer || input.item?.revisor || "Visitante", 120),
     changed_at: new Date().toISOString()
   };
+  if (type === "book_add_many") {
+    if (!Array.isArray(input.relations) || input.relations.length < 1 || input.relations.length > 200) {
+      throw new Error("Selecione entre 1 e 200 obras.");
+    }
+    change.relations = input.relations.map(cleanBookRelation);
+    const relationIds = new Set(change.relations.map(relation => relation.relation_id));
+    const itemChapters = new Set(change.relations.map(relation => `${relation.item_id}|${relation.chapter}`));
+    if (relationIds.size !== change.relations.length || itemChapters.size !== change.relations.length) {
+      throw new Error("A selecao contem obras repetidas.");
+    }
+    return change;
+  }
   if (type.startsWith("book_")) {
     change.relation = cleanBookRelation(input.relation);
     change.before = input.before ? cleanBookRelation(input.before) : null;
@@ -137,6 +149,29 @@ function validateChange(input) {
 }
 
 function applyChange(state, change) {
+  if (change.type === "book_add_many") {
+    state.book_relations ||= [];
+    state.history ||= [];
+    const existingIds = new Set(state.book_relations.map(entry => entry.relation_id));
+    if (change.relations.some(relation => existingIds.has(relation.relation_id))) throw new Error("Uma das relacoes ja existe.");
+    for (const relation of change.relations) {
+      const after = { ...relation, reviewer: change.reviewer, edited_at: change.changed_at };
+      state.book_relations.push(after);
+      state.history.push({
+        type: "book_add",
+        reviewer: change.reviewer,
+        changed_at: change.changed_at,
+        relation_id: after.relation_id,
+        item_id: after.item_id,
+        chapter: after.chapter,
+        old_value: "",
+        new_value: `${after.chapter} | ${after.classification}`
+      });
+    }
+    state.history = state.history.slice(-MAX_HISTORY);
+    state.updated_at = change.changed_at;
+    return state;
+  }
   if (change.type.startsWith("book_")) {
     state.book_relations ||= [];
     state.history ||= [];
@@ -295,7 +330,7 @@ export default async function handler(request) {
     return json(await writeRemote(change));
   } catch (error) {
     const message = error instanceof SyntaxError ? "JSON invalido." : error.message;
-    const status = /invalid|obrigatori|Informe|adicionada|Relacao|Capitulo|Classificacao|existe/.test(message) ? 400 : 502;
+    const status = /invalid|obrigatori|Informe|Selecione|selecao|repetid|adicionada|Relacao|Capitulo|Classificacao|existe/.test(message) ? 400 : 502;
     return json({ error: message }, status);
   }
 }

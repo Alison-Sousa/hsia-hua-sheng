@@ -143,6 +143,36 @@ def build_book_payload(items_path: Path, nlp_path: Path, updates_path: Path) -> 
     }
 
 
+def book_with_revision_items(book: dict[str, Any], revisions: dict[str, Any]) -> dict[str, Any]:
+    """Inclui no catálogo do livro as publicações ativas criadas pela revisão aberta."""
+    merged = dict(book)
+    items = {key: dict(value) for key, value in book.get("items", {}).items()}
+    removed = {
+        str(entry.get("manifestacao_id", "") if isinstance(entry, dict) else entry)
+        for entry in revisions.get("removed", [])
+    }
+    for raw in revisions.get("added", []):
+        if not isinstance(raw, dict) or str(raw.get("manifestacao_id", "")) in removed:
+            continue
+        item_id = str(raw.get("item_id", "") or raw.get("manifestacao_id", "")).strip()
+        if not item_id:
+            continue
+        current = items.get(item_id, {})
+        publication_date = str(raw.get("data_publicacao", "") or current.get("publication_date", ""))
+        items[item_id] = {
+            **current,
+            "item_id": item_id,
+            "title": raw.get("titulo", "") or current.get("title", ""),
+            "year": raw.get("ano", "") or publication_date[:4] or current.get("year", ""),
+            "publication_date": publication_date,
+            "publication_type": raw.get("tipo_publicacao", "") or raw.get("categoria_painel", "") or current.get("publication_type", ""),
+            "source": raw.get("fonte", "") or current.get("source", ""),
+            "url": raw.get("url_original", "") or raw.get("url_principal", "") or current.get("url", ""),
+        }
+    merged["items"] = items
+    return merged
+
+
 def resolve_book_relations(book: dict[str, Any], revisions: dict[str, Any]) -> list[dict[str, Any]]:
     relations = [dict(relation) for relation in book.get("relations", [])]
     by_id = {relation["relation_id"]: relation for relation in relations}
@@ -166,7 +196,7 @@ def resolve_book_relations(book: dict[str, Any], revisions: dict[str, Any]) -> l
                 "relation_id": relation_id,
                 "item_id": item_id,
                 "chapter": chapter,
-                "classification": raw.get("classification", "compartilhado"),
+                "classification": raw.get("classification", "exclusivo"),
                 "active": raw.get("active", True) is not False,
                 "observation": raw.get("observation", ""),
                 "source": raw.get("source", "manual"),
@@ -185,6 +215,7 @@ def resolve_book_relations(book: dict[str, Any], revisions: dict[str, Any]) -> l
 
 
 def book_export_rows(book: dict[str, Any], revisions: dict[str, Any]) -> list[dict[str, Any]]:
+    book = book_with_revision_items(book, revisions)
     chapters = {chapter["id"]: chapter for chapter in book.get("chapters", [])}
     items = book.get("items", {})
     update_counts: dict[tuple[str, int], int] = {}

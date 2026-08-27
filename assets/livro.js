@@ -6,9 +6,17 @@ const $=(selector,root=document)=>root.querySelector(selector),$$=(selector,root
 const esc=value=>String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
 const norm=value=>String(value??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
 const human=value=>String(value||"Não informado").replaceAll("_"," ").replace(/^./,letter=>letter.toUpperCase());
-const state={data:null,overrides:[],remote:false,selectedItem:null,filters:{chapter:"",classification:"",type:"",adherence:0,update:"",query:"",sort:"adherence"}};
+const state={data:null,baseItems:null,overrides:[],remote:false,selectedItems:new Set(),filters:{chapter:"",classification:"",type:"",adherence:0,update:"",query:"",sort:"adherence"}};
 
 function toast(message){const element=$("#toast");element.textContent=message;element.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>element.classList.remove("show"),3500)}
+function localPublicationRevisions(){try{return JSON.parse(localStorage.getItem("hsia-dashboard-revisions-v2"))||{}}catch{return {}}}
+function mergeRevisionItems(revisions={}){
+ const removed=new Set((revisions.removed||[]).map(entry=>typeof entry==="string"?entry:entry?.manifestacao_id).filter(Boolean));state.data.items={...state.baseItems};
+ for(const raw of revisions.added||[]){if(!raw||removed.has(raw.manifestacao_id))continue;const itemId=raw.item_id||raw.manifestacao_id;if(!itemId)continue;const current=state.data.items[itemId]||{};state.data.items[itemId]={...current,item_id:itemId,title:raw.titulo||current.title||"Obra sem título",year:raw.ano||String(raw.data_publicacao||"").slice(0,4)||current.year||"",publication_date:raw.data_publicacao||current.publication_date||"",publication_type:raw.tipo_publicacao||raw.categoria_painel||current.publication_type||"",source:raw.fonte||current.source||"",url:raw.url_original||raw.url_principal||current.url||"",manifestation_id:raw.manifestacao_id||current.manifestation_id||""}}
+}
+async function refreshRevisionData(){
+ let revisions;try{const response=await fetch(API,{cache:"no-store"});revisions=await response.json();if(!response.ok)throw Error();state.overrides=revisions.book_relations||[];state.remote=true}catch{revisions=localPublicationRevisions();try{state.overrides=JSON.parse(localStorage.getItem(LOCAL_KEY))||[]}catch{state.overrides=[]}state.remote=false}mergeRevisionItems(revisions);return revisions;
+}
 function chapterById(id){return state.data.chapters.find(chapter=>chapter.id===Number(id))}
 function itemFor(relation){return state.data.items[relation.item_id]||{item_id:relation.item_id,title:"Obra não encontrada no acervo",year:"",publication_type:"",source:"",url:""}}
 function currentRelations(){
@@ -16,7 +24,7 @@ function currentRelations(){
  for(const override of state.overrides){
   if(!override?.relation_id||!state.data.items[override.item_id])continue;
   if(byId.has(override.relation_id))Object.assign(byId.get(override.relation_id),override);
-  else{const relation={relation_id:override.relation_id,item_id:override.item_id,chapter:Number(override.chapter),classification:override.classification||"compartilhado",active:override.active!==false,observation:override.observation||"",source:override.source||"manual",nlp_chapter:override.nlp_chapter||"",nlp_classification:override.nlp_classification||"",adherence:0,ranking:0,justification:"",contribution:"",...override};relations.push(relation);byId.set(relation.relation_id,relation)}
+  else{const relation={relation_id:override.relation_id,item_id:override.item_id,chapter:Number(override.chapter),classification:override.classification||"exclusivo",active:override.active!==false,observation:override.observation||"",source:override.source||"manual",nlp_chapter:override.nlp_chapter||"",nlp_classification:override.nlp_classification||"",adherence:0,ranking:0,justification:"",contribution:"",...override};relations.push(relation);byId.set(relation.relation_id,relation)}
  }
  return relations;
 }
@@ -112,29 +120,37 @@ async function submitEdit(form){
 async function archiveCurrent(){const form=$("#book-edit-form"),before=findRelation(form.elements.relation_id.value);if(!before)return;const after=relationPayload(before,{active:false});if(await saveBookChange("book_archive",after,relationPayload(before),form.elements.reviewer.value.trim()))$("#book-edit-dialog").close()}
 async function restoreRelation(id){const before=findRelation(id);if(!before)return;const duplicate=duplicateRelation(before.item_id,before.chapter,before.relation_id);if(duplicate&&duplicate.active!==false){toast("Já existe uma relação ativa dessa obra neste capítulo.");return}await saveBookChange("book_restore",relationPayload(before,{active:true}),relationPayload(before),"Visitante")}
 
-function renderAddSearch(){
- const query=norm($("#book-add-search").value),container=$("#book-add-results");state.selectedItem=null;$('#book-add-form [name="item_id"]').value="";$("#book-add-selected").hidden=true;
- if(query.length<2){container.innerHTML='<p>Digite pelo menos duas letras.</p>';return}
- const results=Object.values(state.data.items).filter(item=>norm(`${item.title} ${item.source}`).includes(query)).sort((a,b)=>a.title.localeCompare(b.title,"pt-BR")).slice(0,8);container.innerHTML=results.length?results.map(item=>`<button data-book-pick="${esc(item.item_id)}" type="button"><strong>${esc(item.title)}</strong><span>${esc(item.year||"s.d.")} · ${esc(item.source||"Fonte não informada")}</span></button>`).join(""):"<p>Nenhuma obra encontrada no acervo.</p>";$$('[data-book-pick]',container).forEach(button=>button.onclick=()=>selectAddItem(button.dataset.bookPick));
+function renderSelectedAddItems(){
+ const selected=[...state.selectedItems].map(itemId=>state.data.items[itemId]).filter(Boolean),summary=$("#book-add-selected"),submit=$("#book-add-submit");summary.hidden=!selected.length;submit.disabled=!selected.length;submit.textContent=selected.length?`Adicionar ${selected.length} ${selected.length===1?"obra":"obras"} ao capítulo`:"Adicionar obras ao capítulo";if(!selected.length)return;summary.innerHTML=`<span>${selected.length} ${selected.length===1?"obra selecionada":"obras selecionadas"}</span><strong>${selected.slice(0,4).map(item=>esc(item.title)).join(" · ")}${selected.length>4?` · mais ${selected.length-4}`:""}</strong><small>Você pode continuar marcando outras obras na lista.</small>`;
 }
-function selectAddItem(itemId){const item=state.data.items[itemId];if(!item)return;state.selectedItem=item;$('#book-add-form [name="item_id"]').value=itemId;$("#book-add-results").innerHTML="";const selected=$("#book-add-selected");selected.hidden=false;selected.innerHTML=`<span>Obra selecionada</span><strong>${esc(item.title)}</strong><small>${esc(item.year||"s.d.")} · ${esc(item.source)}</small>`}
-function openAdd(){const form=$("#book-add-form");form.reset();state.selectedItem=null;form.elements.chapter.value=state.filters.chapter||"1";form.elements.classification.value="compartilhado";$("#book-add-results").innerHTML='<p>Busque uma obra que já existe no acervo.</p>';$("#book-add-selected").hidden=true;$("#book-add-dialog").showModal()}
+function renderAddSearch(){
+ const query=norm($("#book-add-search").value),chapter=Number($('#book-add-form [name="chapter"]').value),container=$("#book-add-results"),collator=new Intl.Collator("pt-BR",{sensitivity:"base"});
+ const results=Object.values(state.data.items).filter(item=>item?.item_id&&item.title&&(!query||norm(`${item.title} ${item.source}`).includes(query))).sort((a,b)=>collator.compare(a.title,b.title));
+ if(!results.length){container.innerHTML='<p>Nenhuma obra encontrada no acervo.</p>';renderSelectedAddItems();return}
+ container.innerHTML=`<p class="book-add-result-count">${results.length.toLocaleString("pt-BR")} ${results.length===1?"obra disponível":"obras disponíveis"}</p>${results.map(item=>{const duplicate=duplicateRelation(item.item_id,chapter),checked=state.selectedItems.has(item.item_id)&&!duplicate;if(duplicate)state.selectedItems.delete(item.item_id);return `<label class="book-add-option ${duplicate?"unavailable":""}"><input type="checkbox" data-book-pick="${esc(item.item_id)}" ${checked?"checked":""} ${duplicate?"disabled":""}><span><strong>${esc(item.title)}</strong><small>${esc(item.year||"s.d.")} · ${esc(item.source||"Fonte não informada")}${duplicate?" · já está neste capítulo":""}</small></span></label>`}).join("")}`;
+ $$('[data-book-pick]',container).forEach(input=>input.onchange=()=>{if(input.checked)state.selectedItems.add(input.dataset.bookPick);else state.selectedItems.delete(input.dataset.bookPick);renderSelectedAddItems()});renderSelectedAddItems();
+}
+async function openAdd(){
+ const form=$("#book-add-form");form.reset();state.selectedItems.clear();form.elements.chapter.value=state.filters.chapter||"1";form.elements.classification.value="exclusivo";$("#book-add-search").value="";$("#book-add-results").innerHTML='<p>Atualizando a lista de obras…</p>';$("#book-add-selected").hidden=true;$("#book-add-dialog").showModal();renderSelectedAddItems();await refreshRevisionData();renderAddSearch();
+}
+async function saveBookAdditions(relations,reviewer,skipped=0){
+ if(state.remote){try{const response=await fetch(API,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({type:"book_add_many",relations,reviewer:reviewer||"Visitante"})}),data=await response.json();if(!response.ok)throw Error(data.error||"Não foi possível adicionar as obras.");state.overrides=data.book_relations||[]}catch(error){toast(error.message||"Não foi possível salvar a curadoria no repositório.");return false}}
+ else{const editedAt=new Date().toISOString();for(const relation of relations)state.overrides.push({...relation,reviewer:reviewer||"Visitante",edited_at:editedAt});localStorage.setItem(LOCAL_KEY,JSON.stringify(state.overrides))}
+ renderAll();const suffix=skipped?` ${skipped} ${skipped===1?"obra já estava":"obras já estavam"} no capítulo e não foram repetidas.`:"";toast(`${relations.length} ${relations.length===1?"obra adicionada":"obras adicionadas"}.${suffix}`);return true;
+}
 async function submitAdd(form){
- const itemId=form.elements.item_id.value,chapter=Number(form.elements.chapter.value);if(!itemId||!state.data.items[itemId]){toast("Escolha uma obra nos resultados da busca.");return}const duplicate=duplicateRelation(itemId,chapter);if(duplicate){toast(duplicate.active===false?"Essa relação está arquivada. Restaure-a na lista de arquivados.":"Essa obra já está ligada a esse capítulo.");return}
- const relation={relation_id:`manual:${crypto.randomUUID()}`,item_id:itemId,chapter,classification:form.elements.classification.value,observation:form.elements.observation.value.trim(),active:true,source:"manual",nlp_chapter:"",nlp_classification:""};if(await saveBookChange("book_add",relation,null,form.elements.reviewer.value.trim())){$("#book-add-dialog").close();openChapter(chapter,true)}
+ const chapter=Number(form.elements.chapter.value),selected=[...state.selectedItems].filter(itemId=>state.data.items[itemId]);if(!selected.length){toast("Marque pelo menos uma obra na lista.");return}const eligible=selected.filter(itemId=>!duplicateRelation(itemId,chapter)),skipped=selected.length-eligible.length;if(!eligible.length){toast("As obras selecionadas já estão ligadas a este capítulo.");renderAddSearch();return}
+ const classification=form.elements.classification.value,observation=form.elements.observation.value.trim(),relations=eligible.map(itemId=>({relation_id:`manual:${crypto.randomUUID()}`,item_id:itemId,chapter,classification,observation,active:true,source:"manual",nlp_chapter:"",nlp_classification:""})),submit=$("#book-add-submit");submit.disabled=true;submit.textContent="Salvando…";const saved=await saveBookAdditions(relations,form.elements.reviewer.value.trim(),skipped);if(saved){$("#book-add-dialog").close();openChapter(chapter,true)}else renderSelectedAddItems();
 }
 function bind(){
  const filterMap={"#book-filter-classification":"classification","#book-filter-type":"type","#book-filter-adherence":"adherence","#book-filter-update":"update","#book-filter-sort":"sort"};
  Object.entries(filterMap).forEach(([selector,key])=>$(selector).onchange=event=>{state.filters[key]=event.target.value;renderWorkspace()});
  $("#book-filter-query").oninput=event=>{state.filters.query=event.target.value;renderWorkspace()};$("#book-filter-chapter").onchange=event=>{state.filters.chapter=event.target.value;renderParts();renderWorkspace()};
  $("#book-clear-filters").onclick=()=>{Object.assign(state.filters,{chapter:"",classification:"",type:"",adherence:0,update:"",query:"",sort:"adherence"});for(const id of ["#book-filter-chapter","#book-filter-classification","#book-filter-type","#book-filter-update"])$(id).value="";$("#book-filter-adherence").value="0";$("#book-filter-sort").value="adherence";$("#book-filter-query").value="";renderParts();renderWorkspace()};
- $("#book-open-add").onclick=openAdd;$("#book-edit-form").onsubmit=event=>{event.preventDefault();submitEdit(event.currentTarget)};$("#book-archive-relation").onclick=archiveCurrent;$("#book-restore-nlp").onclick=()=>{const form=$("#book-edit-form"),relation=findRelation(form.elements.relation_id.value);if(!relation||relation.source!=="nlp")return;form.elements.chapter.value=relation.nlp_chapter;form.elements.classification.value=relation.nlp_classification;toast("Sugestão inicial recuperada. Clique em Salvar decisão.")};$("#book-add-form").onsubmit=event=>{event.preventDefault();submitAdd(event.currentTarget)};$("#book-add-search").oninput=renderAddSearch;
- $$('[data-book-close]').forEach(button=>button.onclick=()=>$("#"+button.dataset.bookClose).close());
+ $("#book-open-add").onclick=openAdd;$("#book-edit-form").onsubmit=event=>{event.preventDefault();submitEdit(event.currentTarget)};$("#book-archive-relation").onclick=archiveCurrent;$("#book-restore-nlp").onclick=()=>{const form=$("#book-edit-form"),relation=findRelation(form.elements.relation_id.value);if(!relation||relation.source!=="nlp")return;form.elements.chapter.value=relation.nlp_chapter;form.elements.classification.value=relation.nlp_classification;toast("Sugestão inicial recuperada. Clique em Salvar decisão.")};$("#book-add-form").onsubmit=event=>{event.preventDefault();submitAdd(event.currentTarget)};$("#book-add-search").oninput=renderAddSearch;$('#book-add-form [name="chapter"]').onchange=renderAddSearch; $$('[data-book-close]').forEach(button=>button.onclick=()=>$("#"+button.dataset.bookClose).close());
 }
 async function init(){
- try{const response=await fetch("data/livro.json",{cache:"no-store"});if(!response.ok)throw Error(`HTTP ${response.status}`);state.data=await response.json();try{const revisionResponse=await fetch(API,{cache:"no-store"}),revisions=await revisionResponse.json();if(!revisionResponse.ok)throw Error();state.overrides=revisions.book_relations||[];state.remote=true}catch{try{state.overrides=JSON.parse(localStorage.getItem(LOCAL_KEY))||[]}catch{state.overrides=[]}}
- populateControls();bind();renderAll();$("#book-loading").hidden=true;$("#book-content").hidden=false
+ try{const response=await fetch("data/livro.json",{cache:"no-store"});if(!response.ok)throw Error(`HTTP ${response.status}`);state.data=await response.json();state.baseItems={...state.data.items};await refreshRevisionData();populateControls();bind();renderAll();$("#book-loading").hidden=true;$("#book-content").hidden=false
  }catch(error){$("#book-loading").textContent="Não foi possível carregar a curadoria do livro.";console.error(error)}
-}
-init();
+}init();
 })();

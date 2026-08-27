@@ -19,7 +19,7 @@
       <span><strong>Acervo Hsia Hua Sheng</strong><small>Mapa de publicações e participações</small></span>
     </a>
     <nav aria-label="Navegação principal">
-      <a href="#visao-geral">Visão geral</a><a href="#fontes">Fontes</a><a href="#publicacoes">Publicações</a><a href="#livro">Livro</a>
+      <a href="#visao-geral">Visão geral</a><a href="#metodologia">Metodologia</a><a href="#fontes">Fontes</a><a href="#publicacoes">Publicações</a><a href="#livro">Livro</a>
       <button class="nav-review" id="open-review" type="button"><span id="review-dot"></span>Revisão</button>
     </nav>
   </header>
@@ -69,6 +69,38 @@
       </div>
     </section>
 
+    <section class="method-section" id="metodologia" aria-labelledby="method-title">
+      <div class="method-shell">
+        <header class="method-heading">
+          <div><p class="eyebrow">GUIA DO ACERVO</p><h2 id="method-title">Primeiro, entenda a base</h2></div>
+          <div class="method-heading-aside"><p>Comece pelo panorama, avance até cada publicação e use o Livro para acompanhar a curadoria por capítulo.</p><a class="button method-download" href="assets/documentacao-acervo.pdf" target="_blank" rel="noopener">Abrir documentação em PDF</a></div>
+        </header>
+
+        <div class="method-guide" aria-label="Como navegar pelo acervo">
+          <article><span>01</span><div><small>VISÃO GERAL</small><h3>Os principais números</h3><p>Apresenta o tamanho do acervo, os formatos encontrados e um panorama das obras, manifestações e fontes.</p></div></article>
+          <article><span>02</span><div><small>FONTES</small><h3>Cada veículo e sua produção</h3><p>Mostra as quantidades por fonte e formato. Ao clicar em um número, o leitor chega às publicações que formam aquela contagem.</p></div></article>
+          <article><span>03</span><div><small>PUBLICAÇÕES</small><h3>Os registros individualizados</h3><p>Reúne título, autoria, data, evidência e origem. Também permite adicionar, editar ou retirar um registro; toda alteração fica no histórico.</p></div></article>
+        </div>
+
+        <article class="method-book-guide">
+          <div><p class="eyebrow">SEÇÃO LIVRO</p><h3>Dezessete capítulos ligados às obras do acervo</h3><p>Em cada capítulo aparecem obras exclusivas e compartilhadas, aderência semântica, justificativa, contribuição para a pergunta, links e todos os dados que podem precisar de atualização.</p></div>
+          <div class="method-book-features" aria-label="Ações disponíveis na seção Livro"><span>Adicionar obra existente</span><span>Mover entre capítulos</span><span>Alterar classificação</span><span>Registrar observação</span><span>Arquivar relação</span><span>Restaurar relação</span></div>
+        </article>
+
+        <div class="method-process-heading"><div><p class="eyebrow">COMO O CONTEÚDO É PREPARADO</p><h3>Da coleta à revisão final</h3></div><p>A coleta automática serviu de apoio. Depois, as evidências e as classificações foram revisadas manualmente.</p></div>
+        <div class="method-flow" aria-label="Etapas da metodologia">
+          <article class="method-step"><span>01</span><div><small>COLETA</small><h3>APIs e fontes originais</h3><p>APIs públicas, catálogos e páginas das fontes ajudam a localizar títulos, datas, autorias, endereços e trechos relevantes.</p></div></article>
+          <article class="method-step"><span>02</span><div><small>CONFERÊNCIA MANUAL</small><h3>Evidência antes da inclusão</h3><p>A presença de Hsia, seu papel, o contexto e o link foram conferidos manualmente antes da inclusão. A automação apenas ajudou a localizar os materiais.</p></div></article>
+          <article class="method-step"><span>03</span><div><small>APOIO DO NLP</small><h3>Proximidade com os capítulos</h3><p>O processamento de linguagem natural compara título, resumo e evidência com as perguntas do Livro. O percentual semântico ordena sugestões; não é uma prova de relevância.</p></div></article>
+          <article class="method-step"><span>04</span><div><small>ATUALIZAÇÃO</small><h3>O que merece nova leitura</h3><p>Números, datas e informações dependentes do tempo são sinalizados separadamente. Uma obra pode ter vários dados atualizáveis, e todos permanecem visíveis.</p></div></article>
+        </div>
+        <div class="method-reading">
+          <div><p class="eyebrow">COMO LER O PERCENTUAL</p><h3>É uma pista, não uma decisão</h3><p>Uma aderência alta indica maior proximidade de linguagem e contexto com a pergunta do capítulo. Ela não substitui a leitura da fonte.</p></div>
+          <div class="method-scale" aria-label="Exemplo de leitura da aderência semântica"><span>Menor proximidade</span><div><i></i></div><span>Maior proximidade</span></div>
+          <p class="method-human"><strong>A etapa final foi uma revisão manual.</strong> A sugestão pode ser aceita, movida, classificada, arquivada ou restaurada. A indicação original do NLP fica preservada para comparação e histórico.</p>
+        </div>
+      </div>
+    </section>
     <section class="section section-dark" id="fontes">
       <div class="section-heading">
         <div><p class="eyebrow">FONTES</p><h2>Volumetria por veículo</h2></div>
@@ -171,6 +203,7 @@
   <footer>
     <div><strong>Acervo Hsia Hua Sheng</strong><p>Base organizada para consulta, conferência e revisão.</p></div>
     <div><span>Dados gerados a partir de</span><code>painel_itens.csv</code></div>
+    <div class="footer-credit"><span>Elaboração e curadoria</span><strong>Alison Sousa</strong></div>
   </footer>
 
   <dialog id="detail-dialog" class="modal detail-modal">
@@ -248,15 +281,15 @@
   <dialog id="book-add-dialog" class="modal detail-modal">
     <div class="modal-head"><div><p class="eyebrow">OBRA DO ACERVO</p><h2>Adicionar ao capítulo</h2></div><button class="icon-button" data-book-close="book-add-dialog" aria-label="Fechar">×</button></div>
     <form id="book-add-form" class="book-form">
-      <label class="full"><span>Buscar título ou fonte</span><input id="book-add-search" type="search" autocomplete="off" placeholder="Comece a digitar para encontrar uma obra"></label>
-      <input name="item_id" type="hidden" required>
+      <label class="full"><span>Filtrar por título ou fonte (opcional)</span><input id="book-add-search" type="search" autocomplete="off" placeholder="Digite apenas se quiser reduzir a lista"></label>
+      <p class="book-add-help full">As obras do acervo já aparecem abaixo. Role a lista e marque quantas quiser.</p>
       <div id="book-add-results" class="book-add-results full"></div>
       <div id="book-add-selected" class="book-add-selected full" hidden></div>
       <label><span>Capítulo</span><select name="chapter" required></select></label>
       <label><span>Relação</span><select name="classification" required><option value="exclusivo">Exclusivo</option><option value="compartilhado">Compartilhado</option></select></label>
       <label class="full"><span>Observação editorial</span><textarea name="observation" rows="3" placeholder="Por que esta obra deve entrar neste capítulo?"></textarea></label>
       <label class="full"><span>Seu nome</span><input name="reviewer" placeholder="Para o histórico da curadoria"></label>
-      <button class="button primary full" type="submit">Adicionar ao capítulo</button>
+      <button class="button primary full" id="book-add-submit" type="submit">Adicionar obras ao capítulo</button>
     </form>
   </dialog>
   <div id="toast" role="status" aria-live="polite"></div>
