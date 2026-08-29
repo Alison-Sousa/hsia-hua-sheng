@@ -1,0 +1,33 @@
+# As Commodities são para especialistas!
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP e da UNIFESP-EPPEN)
+
+Data 15/Julho/2018
+
+Investir em ações de empresas de commodities no curto prazo é muito arriscado para pequenos investidores. Os mercados de commodities de petróleo, minério e papel e celulose estão nebulosos. Não há uma tendência clara sobre ciclo global de commodities que dependem de vários fatores sistemáticos: crescimento econômico global, oferta de commodities, moedas internacionais e juros dos principais econômicas do mundo.
+
+Essas ações só deveriam ser investidas no curto prazo quando há uma tendência clara sobre esses fatores. Os pequenos só devem comprar quando cenário de recuperação está um pouco mais claro, mesmo que investidor não consiga comprar a ação no ponto mais baixo do preço. Eles podem comprar depois que o preço começar subir, pelo menos não correu riscos de perder muito dinheiro...
+
+Hoje só os especialistas, por exemplo, gestores de fundos ou especialistas de commodities, que vive no mercado financeiro conseguem ganhar dinheiro operando com esses papeis. Eles têm equipe e consegue monitorar diariamente esses fatores. E esses especialistas balanceia uma parte de suas carteiras de investimento semanalmente. Mesmo assim, muitos desses especialistas perdem dinheiro.
+
+![Imagem 1](imagens/imagem_01.jpeg)
+
+![Imagem 2](imagens/imagem_02.jpeg)
+
+![Imagem 3](imagens/imagem_03.jpeg)
+
+Imagem: Google
+
+Muitos esses fatores podem mudar de um dia para outro. Qual vai ser crescimento econômico global? A resposta depende dessas reuniões e a viagem do Presidente dos EUA Donald Trump para Europa nesse momento. Os próximos passos da guerra comercial entre Estados Unidos e a China vão depender dessas negociações entre Estados Unidos e União Europeia, Inglaterra e Russia. Uma disputa mais acirrada entre EUA e Comunidade Europeia só vai aumentar protecionismo e reduzindo crescimento global.
+
+Por exemplo, a dificuldade de previsão também está o preço internacional de petróleo. A notícia da reabertura de terminais de petróleo da Libia derrubou o preço de petróleo em aproximadamente 8% em um dia. Será que a Libia consegue manter essa promessa por quanto tempo? Qual é a reação de outros grandes produtores da OPEC? E a Russia e os Estados Unidos que são grandes produtores não membros OPECs? Qual é a real gravidade de sanção americana contra Irã? Infelizmente, ninguém sabe... e tudo pode mudar em algumas horas.
+
+Além da volatilidade e surpresas de preço internacional de petróleo, as empresas de petróleos ainda não esclareceram a posição das empresas em relação aos preços da gasolina e diesel no mercado interno. No caso da Petrobras, há um direcionamento, mas falta consenso na pratica entre a Petrobras, Governo e Sociedade.
+
+O papel e celulose e minério também sofrem os mesmos fenômenos. Os preços estão oscilando por fatores de ofertas que podem reverter rapidamente. Por exemplo, a China endureceu na semana passada as medidas de proteção ambiental na China que favoreceu mais importação de celulose e papel. Mas, isso pode ser revertido com a mudança da política para não encarecer os custos de matérias primas na China... E quem está monitorando para refazer estratégia de investimentos em ações?
+
+Portanto, os gestores especializados têm feito semanal e diariamente balanceamento parte de sua carteira de papeis ligados às commodities, conforme os novos acontecimentos. Os pequenos investidores que não tem tempo de monitorar as notícias devem ficar longe desses mercados para evitar perda de dinheiro e de tempo no curto prazo.
+
+Para citação desse artigo: SHENG, H.H. “As Commodities são para especialistas!” (Núcleo de Estudos de International Financial Management, FGV-EAESP), No. 36, 15/07/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores. http://www.fgv.br/eaesp/cursos/hsia-sheng/

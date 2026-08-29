@@ -1,0 +1,29 @@
+# Ano “bom pra cahorro”!!
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP)
+
+Data 19/Fevereiro/2018
+
+Um ano com muito Uaum! Uaum! Uaum! para todos ...!!!! Começou o Ano Novo chinês de cachorro. Em chinês, o latido de cachorro tem mesmo som de prosperidade!!!! E o mercado financeiro da China vai ser “bom pra cachorro”????
+
+Sim, os dados econômicos e financeiros de janeiro de 2018 divulgado na semana passada apontam isso. Se melhorar mercado da dívida, o mercado chinês vai ser melhor ainda.
+
+![Imagem 1](imagens/imagem_01.jpeg)
+
+Atualmente, os analistas internacionais apontar três principais riscos da China: bolha imobiliária, sistema financeiro paralelo (Shadow bank) e excesso de alavancagem financeira (excesso de dívida). Como cada um desses fatores de riscos possui um peso relevante na economia chinesa, um estouro em um desses fatores é capaz de provocar uma reação em cadeia impactando negativamente crescimento econômico.
+
+O risco de bolha imobiliária está reduzido. As empresas imobiliárias chinesas conseguiu diminuir consideravelmente seus estoques e sua alavancagem financeira. Embora as empresas não tenha conseguido vender mais que ano passado, os números de janeiro mostram que as famílias a voltaram a adquirir imóveis com financiamento imobiliário. Consequentemente, essas empresas imobiliárias estão cada vez mais saudáveis financeiramente, pois as dívidas corporativas delas foram transferidas indiretamente para compradores de imóvel. Além disso, a política governamental de incentivo o aluguel e restrição de empréstimos para especulação imobiliária também ajudam estabilizar preços de imóvel, melhorar qualidade de crédito e reforçar caixa e melhorar lucros dessas empresas.
+
+O problema de Shadow bank também está controlado. Com maior supervisão e atuação para “limpar” de sistema financeiro, a Comissão Reguladora do Setor Bancário da China (CBRC) conseguiu incluir mais as operações de empréstimos que eram contabilizadas fora do balanço no sistema financeiro formal. Por exemplo, as principais modalidades do Sistema financeiro paralelo, tais como “combined trust loans”, “entrusted loans” e “undiscounted bankers' acceptances”, foram reduzidas significativamente desde ano passado. Os CBRC continuará a penalizar mais duramente as violações em empréstimos imobiliários, ativos não lucrativos e gestão empresarial.
+
+Em relação ao risco de divida, há pontos para melhorar. O governo já adotou uma serie de medidas para redução de alavancagem financeira por meio de dívidas. O governo também incentiva as empresas a acessarem mercado acionário via as principiais Bolsas da China. As empresas grandes podem listar na Bolsa de Shanghai, e as empresas pequenas e médias podem listar na Bolsa de Shenzhen. Mas, infelizmente, as empresas continuam dependendo excessivamente das dívidas para financiar suas operações. Essa composição desbalanceada coloca um serie de perguntas sobre capacidade de honrar compromisso e uso desses recursos para fins especulativos...
+
+Como os detentores atuais das dívidas são chineses, esse risco de mercado de dívida é controlado. No entanto, esse riscos pode tornar crítico à medida que a moeda chinesa RMB (RenMinBi) se torna mais internacional. Os países que aceitam moeda chinesa como moeda de comercio exterior ou reserva vão precisar alternativas de aplicações financeiras para remunerar RMB. E esses títulos de mercado de renda fixa seria uma alternativa interessante para esses países. Imagine, se tiver uma onda inadimplência desses títulos de dívida, como ficaria credibilidade de RMB?
+
+Apesar de ter espaço para melhorar, os investidores estrangeiros já estão reconhecendo redução desses riscos da China. Os preços das ações de Banco e empresas imobiliárias subiram nas vésperas do de Ano Novo Chinês tanto na Bolsas da China quanto nas Bolsas de Hongkong! A expectativa é que essa valorização de ações não só continua esses setores, mas também estende para setores relacionados com consumo interno da China!!! Ótima abertura de mercado acionário do ano Uaum Uaum no dia 22/02/2018!!!
+
+© 2018 Hsia Hua Sheng All Rights Reserved / © 2018 Hsia Hua Sheng todos os direitos reservados
+
+Para citação desse artigo: SHENG, H.H. “Ano “bom pra cahorro”!!” Série de Estudo de International Financial Management (Instituto de Finanças, FGV-EAESP), No. 15, 19/02/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores. http://www.fgv.br/eaesp/cursos/hsia-sheng/

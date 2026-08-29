@@ -1,0 +1,29 @@
+# Nossos Heróis: Soja, Milho e Trigo
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP)
+
+Data 05/Março/2018
+
+Boas notícias vindas da China! Enquanto setor de mineração e siderurgia no Brasil ficava preocupado com a tumultuada semana de comércio internacional, o setor de agronegócio viveu uma semana bem animado!
+
+O “anúncio” de uma guerra comercial com aumento de tarifa de importação de ações e alumínio nos Estados Unidos pode provocar uma queda do crescimento do PIB Global. Maior esfriamento crescimento, menos consumo, e menos necessidade de commodities/matérias primas. Mas, parece que isso não vai chegar nos alimentos tão cedo.
+
+![Imagem 1](imagens/imagem_01.jpeg)
+
+Soja, milho e trigo conseguiram sobreviver esse tumulto, e a tendência é mais aumento de preço. As cotações da soja tiveram nessa ultima quinta-feira (01/Março) mais um dia de ganhos no mercado físico brasileiro, seguindo a tendência de fortes altas na Bolsa de Chicago (CBOT). O milho também bateu recorde nos últimos 7 meses. O preço do trigo também seguiu essa tendência.
+
+A razão está nos fundamentos reais desses produtos agrícolas. A produção mundial está prejudicada por causa da seca na Argentina, Austrália e Centro dos Estados Unidos. Essas regiões são importantes produtores de soja, trigo e milho. Os fundos de hedge fundos já perceberam essa queda potencial de produção. Desde meado de fevereiro, os fundos começaram assumir dominantemente a posição de comprada no mercado futuro para “apostar” a alta do preço.
+
+Esses preços tendem aumentar ainda mais com boas notícias da demanda chinesa. O rendimento e a qualidade de vida da área rural da China continuam aumentando. As programações do 13º. Congresso do Partido Comunista da China que inicia hoje (05/Março) confirma o contínuo esforço e determinação do Presidente Xi em melhorar renda da população rural da China. Hoje, residente recorrente da população rural é de 0,6 bilhões de pessoas.
+
+Desta vez, o foco do governo chinês não é só na organização e padronização de produção agrícola, mas também na criação e fortalecimento de indústria cultural e turismo rural que ajudam preservar meio ambiente e criar mais empregos na área rural. Um dos exemplos, é a expansão da indústria de chás verde e chá vermelhos. Esses chás regionais premiadas estão ganhando mais reputações internacionais, principalmente, depois de servir ao Presidente Americano Donald Trump, Primeiro Ministro do Reino Unido Theresa May, Presidente da França Emmanuel Macron.
+
+Portanto, os produtores brasileiros estão em festa com cenário de aumento de preço de soja, milho e trigo no curto prazo! A produção brasileira deste ano também não sofre maiores problemas grave com mapas climáticos!
+
+Espero que a indústria de alimento e processadora de carne bovina, suína, ovina e frango possa aproveitar ess festa! Será que essas empresas fez estoque de ração ou fez hedge (seguro) para se proteger do aumento do preço?
+
+© 2018 Hsia Hua Sheng All Rights Reserved / © 2018 Hsia Hua Sheng todos os direitos reservados
+
+Para citação desse artigo: SHENG, H.H. “Nossos Heróis: Soja, Milho e Trigo ” Série de Estudo de International Financial Management (Instituto de Finanças, FGV-EAESP), No. 17, 05/03/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores. http://www.fgv.br/eaesp/cursos/hsia-sheng/

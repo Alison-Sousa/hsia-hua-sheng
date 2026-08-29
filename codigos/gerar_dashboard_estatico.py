@@ -16,6 +16,8 @@ ROOT=Path(__file__).resolve().parents[1]
 ITEMS=ROOT/"paineis"/"painel_itens.csv"; VOLUME=ROOT/"paineis"/"painel_volumetria.csv"
 NLP=ROOT/"paineis"/"painel_nlp.csv"; UPDATES=ROOT/"paineis"/"painel_dados_atualizaveis.csv"
 OUTDIR=ROOT/"data"; OUT=OUTDIR/"dashboard.json"; BOOK_OUT=OUTDIR/"livro.json"; CREDITS=OUTDIR/"creditos_editoriais.json"
+LINKEDIN_ARCHIVE=ROOT/"hsia_linkedin_2017_2018_estruturado"
+LINKEDIN_ARTICLES=LINKEDIN_ARCHIVE/"artigos"; LINKEDIN_LINKS=LINKEDIN_ARCHIVE/"ARTIGOS.md"
 CATEGORIES={
  "colunas_autorais":"Colunas autorais","entrevistas_escritas_completas":"Entrevistas escritas",
  "transcricoes_palestras_aulas":"Transcrições e aulas","participacoes_em_reportagens":"Participações em reportagens",
@@ -35,6 +37,30 @@ def yes(value): return norm(value) in {"sim","s","true","1","yes"}
 def split_urls(value):
  if norm(value) in {"","nenhuma","nao se aplica","nao_se_aplica"}: return []
  return [v.strip() for v in re.split(r"\s*\|\s*|\s*;\s*",value) if v.strip().startswith(("http://","https://"))]
+def title_key(value): return re.sub(r"[^a-z0-9]","",norm(value))
+
+def load_linkedin_archive():
+ if not LINKEDIN_ARTICLES.is_dir() or not LINKEDIN_LINKS.is_file():
+  raise RuntimeError("Arquivo estruturado do LinkedIn 2017-2018 ausente ou incompleto.")
+ links={}
+ for line in LINKEDIN_LINKS.read_text(encoding="utf-8").splitlines():
+  match=re.fullmatch(r"- \[(.+)\]\((https?://[^)]+)\)",line.strip())
+  if match: links[title_key(match.group(1))]=match.group(2)
+ entries=[]
+ for article_path in sorted(LINKEDIN_ARTICLES.glob("*/artigo.json")):
+  article=json.loads(article_path.read_text(encoding="utf-8")); content_path=article_path.with_name("conteudo.md")
+  item_id=str(article.get("item_id") or "").strip(); title=str(article.get("titulo") or "").strip()
+  if not item_id or not title or not content_path.is_file(): raise RuntimeError(f"Artigo local incompleto: {article_path.parent.name}")
+  entries.append({"archive_item_id":item_id,"title":title,"title_key":title_key(title),
+   "content_path":content_path.relative_to(ROOT).as_posix(),"order":int(article.get("ordem_no_arquivo") or 0),
+   "source_url":links.get(title_key(title),"")})
+ if len(entries)!=52: raise RuntimeError(f"Esperados 52 artigos locais; encontrados {len(entries)}.")
+ if len({entry["archive_item_id"] for entry in entries})!=52 or len({entry["title_key"] for entry in entries})!=52:
+  raise RuntimeError("O arquivo estruturado contém item_id ou título repetido.")
+ if sum(bool(entry["source_url"]) for entry in entries)!=49:
+  raise RuntimeError("A lista consolidada deve conter 49 links e 3 origens indisponíveis.")
+ return {"entries":entries,"by_item_id":{entry["archive_item_id"]:entry for entry in entries},
+  "by_title":{entry["title_key"]:entry for entry in entries}}
 
 def clean_name(value:Any):
  if isinstance(value,dict): value=value.get("name") or value.get("alternateName") or ""
@@ -111,10 +137,15 @@ def credit_fields(row,cache):
  if role in {"palestrante","participante","speaker"}: return "Participação","Hsia Hua Sheng","Palestrante ou participante"
  return "Crédito",nominal or (authors if not absent else f"Responsabilidade editorial de {source}"),"Registro relacionado a Hsia Hua Sheng"
 
-def build(rows,volumes,cache):
- enriched=[]
+def build(rows,volumes,cache,linkedin_archive):
+ enriched=[]; matched_local=set()
  for order,row in enumerate(rows,1):
   item=dict(row); label,credit,participation=credit_fields(row,cache)
+  local=linkedin_archive["by_item_id"].get(row.get("item_id","")) or linkedin_archive["by_title"].get(title_key(row.get("titulo","")))
+  if local:
+   matched_local.add(local["archive_item_id"]); item.update({"conteudo_local":local["content_path"],
+    "conteudo_local_ordem":local["order"],"origem_externa_indisponivel":not bool(local["source_url"])})
+   item["url_original"]=local["source_url"]; item["url_principal"]=local["source_url"]
   item.update({"rotulo_credito":label,"credito_exibicao":credit,"participacao_hsia":participation,
    "categoria_label":CATEGORIES.get(row.get("categoria_painel",""),row.get("categoria_painel","").replace("_"," ").title()),
    "urls_secundarias_lista":split_urls(row.get("urls_secundarias","")),"contabilizado":yes(row.get("contabilizado_na_volumetria","")),
@@ -122,9 +153,12 @@ def build(rows,volumes,cache):
  official=[x for x in enriched if x["contabilizado"]]; source_totals={}
  for item in official:
   source=item.get("fonte") or "Fonte não informada"; source_totals[source]=source_totals.get(source,0)+1
+ if len(matched_local)!=len(linkedin_archive["entries"]):
+  missing=sorted(entry["title"] for entry in linkedin_archive["entries"] if entry["archive_item_id"] not in matched_local)
+  raise RuntimeError(f"Artigos locais sem registro correspondente no painel: {missing}")
  return {"meta":{"gerado_em":datetime.now(timezone.utc).isoformat(),"total_manifestacoes":len(official),"total_registros":len(enriched),
   "total_fontes":len(source_totals),"total_obras":len({x.get("item_id") for x in official if x.get("item_id")}),
-  "creditos_nominais_recuperados":sum(bool(v.get("credito")) for v in cache.values())},
+  "creditos_nominais_recuperados":sum(bool(v.get("credito")) for v in cache.values()),"total_conteudos_locais":len(matched_local)},
   "categorias":[{"id":key,"label":label,"total":sum(x.get("categoria_painel")==key for x in official)} for key,label in CATEGORIES.items()],
   "totais_fontes":source_totals,"volumetria":volumes,"itens":enriched,"config":{"github_new_issue_url":""}}
 
@@ -133,7 +167,7 @@ def main():
  if not all(path.exists() for path in (ITEMS,VOLUME,NLP,UPDATES)): print("Painéis obrigatórios ausentes.",file=sys.stderr); return 2
  rows,volumes,cache=read_csv(ITEMS),read_csv(VOLUME),load_cache()
  if args.atualizar_creditos: cache=update_cache(rows,cache,max(args.limite_creditos,0))
- payload=build(rows,volumes,cache); book=build_book_payload(ITEMS,NLP,UPDATES); OUTDIR.mkdir(parents=True,exist_ok=True); OUT.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
+ linkedin_archive=load_linkedin_archive(); payload=build(rows,volumes,cache,linkedin_archive); book=build_book_payload(ITEMS,NLP,UPDATES); OUTDIR.mkdir(parents=True,exist_ok=True); OUT.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
  BOOK_OUT.write_text(json.dumps(book,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
  print(f"{OUT.relative_to(ROOT)}: {payload['meta']['total_manifestacoes']} manifestações | {BOOK_OUT.relative_to(ROOT)}: {book['meta']['total_relations']} relações"); return 0
 if __name__=="__main__": raise SystemExit(main())

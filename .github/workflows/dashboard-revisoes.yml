@@ -11,6 +11,8 @@ on:
       - "codigos/gerar_dashboard_estatico.py"
       - "codigos/gerar_exportacoes_dashboard.py"
       - "codigos/livro_dashboard.py"
+      - "hsia_linkedin_2017_2018_estruturado/ARTIGOS.md"
+      - "hsia_linkedin_2017_2018_estruturado/artigos/**"
   workflow_dispatch:
 
 permissions:
@@ -48,6 +50,11 @@ jobs:
           assert all(r["manifestacao_id"] and r["titulo"] and r["fonte"] for r in rows)
           assert len(livro["chapters"]) == 17 and livro["relations"], "livro.json ficou incompleto"
           assert all(r["item_id"] in livro["items"] for r in livro["relations"])
+          locais=[item for item in data["itens"] if item.get("conteudo_local")]
+          assert len(locais) == 52, "os 52 artigos locais não foram associados"
+          assert sum(item.get("origem_externa_indisponivel") is True for item in locais) == 3
+          assert all(Path(item["conteudo_local"]).is_file() for item in locais)
+          assert all("fonte_original" not in item["conteudo_local"] and not item["conteudo_local"].endswith(".docx") for item in locais)
           print(f"{len(rows)} manifestações validadas")
           PY
       - name: Registrar resultados atualizados

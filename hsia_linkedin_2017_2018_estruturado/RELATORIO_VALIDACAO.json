@@ -1,0 +1,19 @@
+{
+  "fonte": "0_Total_Colunas Linkedin Hsia 2017 e 2018.docx",
+  "candidatos_por_marcador_autor": 54,
+  "publicacoes_unicas_geradas": 52,
+  "duplicatas_consolidadas": 2,
+  "imagens_extraidas": 69,
+  "tabelas_extraidas": 2,
+  "datas_nao_localizadas": [
+    {
+      "item_id": "hsia-li-79f48d0da1fe",
+      "titulo": "Tem-Tem Win-Win: Fundo de Investimento China - Brasil"
+    },
+    {
+      "item_id": "hsia-li-bc1c5a6e81e1",
+      "titulo": "Quem paga mais taxa de juros? Brasil ou China?"
+    }
+  ],
+  "erros": []
+}

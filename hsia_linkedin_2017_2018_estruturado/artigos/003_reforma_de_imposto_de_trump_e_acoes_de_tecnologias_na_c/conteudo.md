@@ -1,0 +1,27 @@
+# Reforma de Imposto de Trump e ações de tecnologias na China!
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP)
+
+Data 04/Dez/2017
+
+Na semana passada, a reforma tributaria do Presidente Donald Trump dos Estados Unidos foi o principal fator externo que influenciou desempenho das principais bolsas da China. As ações das empresas relacionadas com setores de semicondutores, alta tecnologia e eletrônicos reagiram negativamente a essa proposta. Por quê?
+
+A proposta central da reforma de Trump é uma redução dos impostos cobrados das empresas de 35% para 20%. Pela teoria de finanças corporativas, uma redução de impostos corporativos aumenta a os lucros e geração de caixa operacional de empresas. A conversão desse lucro em mais investimentos pode gerar mais crescimento e mais fluxos de caixa futuro das empresas e aumentando valor de suas ações.
+
+Mas, esse potencial de redução de impostos não aumentou preços das ações das gigantes empresas de altas tecnologias listadas na Nasdaq Composite. Por exemplo, os preços das ações das empresas FAANG ( Não é um Chinese... : ) que representam Facebook (FB), Amazon (AMZN), Apple (AAPL), Netflix (NFLX), e Alphabet (GOOG)) não subiram na ultima semana.
+
+O que está acontecendo com setor de alta tecnologia nos Estados Unidos? Na verdade, segundo os especialistas americanos, a atual média geral de impostos de tecnologia já é de 18,5%, por isso, a redução de impostos do Trump não beneficiaria diretamente dessas empresas de tecnologia e sim beneficiaria as empresas de tradicionais americanas listadas no Dow Jones Industrial Average.
+
+Fontes: acesso livre da Internet / Google
+
+![Imagem 1](imagens/imagem_01.jpeg)
+
+![Imagem 2](imagens/imagem_02.png)
+
+Portanto, as empresas chinesas que são os principais fornecedores de componentes eletrônicos dessas gigantes Multinacionais americanas também sofreram com a queda de suas ações. Além disso, o relatório de um conceituado banco de investimento global americano aponta que os preços atuais dessas empresas chinesas já incorporaram todas boas estimativas de vendas de Iphone 10. Para uma nova onda de valorização, é preciso ter uma nova tese de rentabilidade. Consequentemente, as empresas de tecnologias chinesas vão precisar trabalhar “desde já” um bom tema para a rentabilidade do primeiro trimestre de 2018!!!
+
+© 2017 Hsia Hua Sheng All Rights Reserved / © 2017 Hsia Hua Sheng todos os direitos reservados
+
+Para citação desse artigo: SHENG, H.H. “Reforma de Imposto de Trump e ações de tecnologias na China!”. Série de Estudo de International Financial Mangement (Instituto de Finanças, FGV-EAESP), No. 4, 03/12/2017, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores. http://www.fgv.br/eaesp/cursos/hsia-sheng/

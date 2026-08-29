@@ -1,0 +1,27 @@
+# America First
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP e da UNIFESP-EPPEN)
+
+Data 15/Setembro/2018
+
+O Presidente Americano Donald Trump conseguiu a última peça que faltava na sua política de America First nessa semana. Além de emitir e controlar a moeda e taxa de juros mais utilizada e influente do mundo, os Estados Unidos passam a ter influencia direta do mercado de commodities por meio da produção própriade petróleo.
+
+Provavelmente, os Estados Unidos podem reivindicar o título de maior produtor de petróleo do mundo antes do esperado. O Departamento de Energia dos EUA disse na quarta-feira (12/09) que a América "provavelmente superou" a produção de petróleo em relação à Rússia (maior produtor de países não OPEC) em junho e agosto de 2018, depois de superar a Arábia Saudita (maior produtor OPEC) no início deste ano.
+
+Se houver uma instabilidade econômica americana, não adianta diversificar seus patrimônios em Europa, Ásia ou no prório Estados Unidos, todos serão afetados e todos vão ficar mais pobres...
+
+![Imagem 1](imagens/imagem_01.jpeg)
+
+Fonte Imagem: Google / Wealth Daily
+
+A produção de petróleo de xisto (Shale Oil) é o grande responsável dessa vitória americana. Enquanto que a Russia e Arabia Saudita tem mantido nível de produção nos últimos anos, os Estados Unidos aceleraram a exploração de petróleo de xisto. Em um ano, a produção aumentou aproximadamente 25%. Hoje, A agência de energia dos EUA estimou que os Estados Unidos produziram uma média de 10,9 milhões de barris por dia em agosto, em comparação com cerca de 10,8 milhões de barris diários da Rússia e cerca de 10,4 milhões da Arábia Saudita. Nesse meio tempo, a produtividade e eficiência aumentaram e o custo médio de produção caiu para 40US$ por barril. Esse custo era bem maior que 60US$ alguns anos atrás.
+
+Com o aumento de participação americana na produção, aumenta o uso do WTI (West Texas Intermediate) como determinação de preço de petróleo no mundo. Hoje o poder de determinação de preço mundial é dividido em duas principais referencias de preço. Um é preço de petróleo Brent que é comercializado na Bolsa Londres, tendo como referência tanto o petróleo extraído no Mar do Norte como no Oriente Médio. Outro é o WTI que é mais leve e é comercializado na Bolsa de Nova York, e se refere ao produto extraído principalmente na região do Golfo do México.
+
+Portanto, com a junção dessa última peça, os Estados Unidos conseguiram implementar América First, pois passam a controlar diretamente todos os principais fatores de riscos sistemáticos globais, tais como juros, cambio, commodites e comércio global. Se houver uma instabilidade e crise econômica americana, não adianta diversificar seus patrimônios em Europa, Ásia ou no prório Estados Unidos, todos serão afetados e todos vão ficar mais pobres...
+
+Este artigo expressa a opinião do autor, não representando necessariamente a opinião institucional da FGV” © 2018 Hsia Hua Sheng All Rights Reserved.
+
+Para citação desse artigo: SHENG, H.H. “América First” (Núcleo de Estudos de International Financial Management, FGV-EAESP), No. 45, 16/09/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores.http://www.fgv.br/eaesp/cursos/hsia-sheng/

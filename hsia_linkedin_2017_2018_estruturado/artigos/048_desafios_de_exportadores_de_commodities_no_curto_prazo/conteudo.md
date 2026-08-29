@@ -1,0 +1,27 @@
+# Desafios de Exportadores de Commodities no Curto Prazo!
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP e da UNIFESP-EPPEN)
+
+Data: 05/Novembro/2018
+
+A perspectiva dos principais mercados de commodities não é boa no curto prazo. Valorização de real está reduzindo lucro de exportadores brasileiros. Foram seis semanas de valorização de real até vitória do Sr. Bolsonaro como novo Presidente do Brasil. Dependendo das primeiras medidas implementadas pelo novo Presidente, o Real pode voltar a valorizar com atração de mais o capital estrangeiro. Um alívio pode vir na continuidade da política americana de valorização de dólar e aumenta de taxa de juros americanos que tendem desvalorizar moedas no mercado emergente. Mas, essa continuidade vai depender dos resultados da eleicao legislativa americana no dia 06/11/2018.
+
+![Imagem 1](imagens/imagem_01.png)
+
+Fonte Imagem: Google
+
+O preço internacional de petróleo também apresenta queda apesar da sanção contra Irã que começara vigorá hoje. De acordo com o mercado, a ideia original do governo americano era proibição total de exportação de petroleo do Irã, mas isso pode gerar alguns efeitos indesejaveis no curto prazo: i) aumento de preço de petroleo que pode piorar mais a inflação nos Estados Unidos; ii) aumento de poder de discriminação de preço da Russia no mercado de Petroleo; iii) desconforto desnecessários com os principais parceiros mundias tais como Japão, Coreia, China, Turquia e India que dependem fortemente a importação de petroleo do Irã. Portanto, a sancao começará hoje mas haverá uma especie de regime especial para alguns países que podem continuar importando petróleo do Irã.
+
+A perspectiva de papel e celulose também não é boa. A China é um dos princiapis importador de celulose brasileira. Com a redução de ritmo de crescimento economico devido ao Guerra comercial Estados Unidos e a China, os empresasrios chineses estão reduzindo sua demanda de papel já nesse ultimo trimestre de 2018. Só esse movimento já fez o preço de papel de atacado na China ter uma queda de 30% nos ultimos dias (os preços de ações da Suzano tambem caiu esses dias...) Esse movimento de redução pode ser ainda maior a partir de 1º. Trimestre de 2019 quando o efeito dos primeiros aumentos de tarifas americana será concretizada de forma plena. Para agravar a situação da celulose, o preço de celulose pode cair ainda mais, uma vez que o governo chines tem investido na sua política de sustentabilidade e proteção ao meio ambiente. A tendencia é haverá maior reciclagem de papel naõ so do mercado interno, mas importação de papeis usadas para serem recicladas na China.
+
+O preço de minério também sofre no curto prazo com a redução de atividades economica da China. O mercado ainda não tem ideia como o governo chines vai reagir para manter seu ritmo de crescimento. Tradicionamente, o governo chine aumenta seu investimentos em obras publicas. Mas, essa política ainda não está clara para ano de 2019. Por isso, o minério brasileiro precisará um novo comprador para compensar a queda de venda para China. E os executivos do setor já está se aproximando mais da Índia que promete crescimento robusto nos proximos anos.
+
+As exportações de commodities agricolas, carnes e frango brasileiras também estão incertas com uma possível mudança da política externa do novo governo Presidente Bolsonaro. A nova política que priorizaria a ideologia está preocupando o mercado financeiro. Em termos pragmaticos, isso pode prejudicar as relações comerciais com os grande parceiros do Brasil. Os países Árabes são importadores relevantes de carne e frango brasileiro. A China é um importador importante de grão e dos os principais commodities brasileiras. Os outros paises parceiros comerciais também podem comprar menos outros produtos importante na puata de exportações brasileiras tais como açucar, café arábica e suco de laranja do Brasil.
+
+Portanto, há grandes desafios para setor de commodities no Brasil no curto prazo. As empresas precisam ser mais conservador na gestão financeira enfrentar para não só maior oscilações de preços, mas também a possbilidade de menor volume de exportação reduzindo considerávelmente seus lucros no curto prazo.
+
+Este artigo expressa a opinião do autor, não representando necessariamente a opinião institucional da FGV” © 2018 Hsia Hua Sheng All Rights Reserved.
+
+Para citação desse artigo: SHENG, H.H. “Desafios de Exportadores de Commodities no Curto Prazo! (Núcleo de Estudos de International Financial Management, FGV-EAESP), No. 52, 05/11/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores.http://www.fgv.br/eaesp/cursos/hsia-sheng/

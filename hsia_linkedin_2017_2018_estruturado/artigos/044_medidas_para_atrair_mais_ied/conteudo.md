@@ -1,0 +1,27 @@
+# Medidas para atrair mais IED!
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP e da UNIFESP-EPPEN)
+
+Data: 07/Outubro/2018
+
+Hoje é um dia importante no cenário político brasileiro. O resultado da votação de hoje revela o que povo brasileiro quer para próximos anos e reduz consideravelmente o risco político que vem provocando elevada volatilidade nos preços de ações e de taxa de cambio e juro no Brasil.
+
+Para segundo turno, ambos lados vão ter mais tempo para esclarecer melhor como pretende conduzir a política econômica do país. A ideologia pode ser extrema, mas sem recursos, o governo não vai poder investir na segurança, educação e saúde. E o contexto da crise de comercio mundial que vai enfraquecer economia global de forma mais sensível a partir próximo ano só vai exigir mais cuidado na gestão publica e reforma necessária para recuperar a economia brasileira.
+
+O mercado financeiro brasileiro tem se preocupado com a agenda econômica dos candidatos. Como havia muito ruído nas propostas econômicas, o aumento de intenção de voto do mesmo candidato provocava uma reação completamente contraditória em momentos diferentes. Como consequência, as notícias negativas dos investimentos estrangeiros em carteira de ativos financeiros e investimentos estrangeiros diretos (IED) eram publicada diariamente nas últimas semanas. E os preços de ações subiam e desciam em questões de segundos sem que a empresa tenha mudado margem de lucro, geração de caixa e taxa de crescimento...
+
+![Imagem 1](imagens/imagem_01.png)
+
+Em relação a segundo turno, um dos desejo do mercado é ter uma proposta do dos candidatos para atrair mais Investimento Estrangeiro Direto (IED) para o Brasil. Esse capital estrangeiro de longo prazo pode contribuir para nosso processo de recuperação não só pela sua capacidade de melhorar a eficiência de produção em parceria com empresas brasileiras, mas também pela sua conexão de fazer mais exportação de produtos brasileiros para outros países.
+
+Várias empresas estrangeiras já estão ajudando esse processo de recuperação. As empresas que já atuam no Brasil estão promovendo o Brasil como uma plataforma da América Latina para exportar mais produtos brasileiros para outros países da América Latina. Isso está acontecendo em todos os setores, desde a indústria de agronegócio, autopeças, químicas e ate eletrônicas.
+
+Além disso, há mais capital estrangeiro no setor de infra estrtura. Por exemplo, mais estrangeiros de diversas nacionalidades nos leiloes de energia e petroleo. Recentemente, o capital estrangeiro tambem está entrando no material de construção civil. Há alguns dias, o capital francês cimenteira Vicat acerta compra de 65% da Ciplan por R$ 1,29 bilhão. A crise econômica mais importante que o país já atravessou esses últimos anos agravou incremento da ociosidade da indústria cimenteira. Atualmente a ociosidade é de 34%. Os fabricantes trabalharam em 2016 ao ritmo de 43% de ociosidade, nível bem superior aos 30% verificados em 2015. Para complicar empresas desse setor, o aumento dos custos financeiros e a destruição do capital produtivo (investimentos feitos) nos anos anteriores também reduziu a margem. .
+
+Portanto, empresas estrangeiras serão parceiros importantes para próximo governo. Uma agenda mais concreta e progressista vai atrair mais esse capital de todos os países para trabalhar junto com empresas brasileiras, gerando mais renda, emprega e impostos para o Brasil.
+
+Este artigo expressa a opinião do autor, não representando necessariamente a opinião institucional da FGV” © 2018 Hsia Hua Sheng All Rights Reserved.
+
+Para citação desse artigo: SHENG, H.H. “Medidas para atrair mais IED !” (Núcleo de Estudos de International Financial Management, FGV-EAESP), No. 48, 08/10/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores.http://www.fgv.br/eaesp/cursos/hsia-sheng/

@@ -84,9 +84,13 @@ function publicationBookHTML(item,compact=false){
 function bindBookRelationButtons(root=document){
  [...root.querySelectorAll("[data-publication-book-relation]")].forEach(button=>button.onclick=()=>{const relationId=button.dataset.publicationBookRelation,dialog=button.closest("dialog");if(dialog?.open)dialog.close();window.HsiaBook?.editRelation(relationId)});
 }
+function localContentItem(item){
+ const base=item.conteudo_local?item:state.data?.itens.find(entry=>entry.item_id===item.item_id&&entry.conteudo_local);if(!base)return null;
+ return {...item,conteudo_local:base.conteudo_local,origem_externa_indisponivel:base.origem_externa_indisponivel===true};
+}
 function cardHTML(item){
- const id=getId(item),removed=isRemoved(item),url=safeUrl(item.url_original||item.url_principal),year=item.ano||String(item.data_publicacao||"").slice(0,4)||"s.d.";
- return `<article class="card ${removed?"removed":""}" data-id="${esc(id)}"><div class="card-top"><span class="category-tag">${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</span><span class="card-year">${esc(year)}</span></div><h3>${esc(item.titulo||"Título não informado")}</h3><p class="card-source">${esc(item.fonte)}</p><div class="credit"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong><div class="participation">${esc(item.participacao_hsia)}</div></div>${publicationBookHTML(item,true)}<div class="card-actions"><button class="open-detail" data-id="${esc(id)}" type="button">Ver detalhes</button>${url?`<a class="source-link" href="${esc(url)}" target="_blank" rel="noopener">Abrir origem</a>`:""}<button class="review-action" data-id="${esc(id)}" title="${removed?"Restaurar":"Marcar para remover"}" aria-label="${removed?"Restaurar":"Marcar para remover"}">${removed?"↶":"−"}</button></div></article>`;
+ const id=getId(item),removed=isRemoved(item),url=safeUrl(item.url_original||item.url_principal),local=localContentItem(item),year=item.ano||String(item.data_publicacao||"").slice(0,4)||"s.d.";
+ return `<article class="card ${removed?"removed":""}" data-id="${esc(id)}"><div class="card-top"><span class="category-tag">${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</span><span class="card-year">${esc(year)}</span></div><h3>${esc(item.titulo||"Título não informado")}</h3><p class="card-source">${esc(item.fonte)}</p><div class="credit"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong><div class="participation">${esc(item.participacao_hsia)}</div></div>${publicationBookHTML(item,true)}${local?.origem_externa_indisponivel&&!url?'<p class="local-origin-unavailable compact">Origem externa indisponível — conteúdo preservado no acervo.</p>':""}<div class="card-actions"><button class="open-detail" data-id="${esc(id)}" type="button">Ver detalhes</button>${url?`<a class="source-link" href="${esc(url)}" target="_blank" rel="noopener">Abrir origem</a>`:""}<button class="review-action" data-id="${esc(id)}" title="${removed?"Restaurar":"Marcar para remover"}" aria-label="${removed?"Restaurar":"Marcar para remover"}">${removed?"↶":"−"}</button></div></article>`;
 }
 function renderCards(){
  const items=filtered(),shown=items.slice(0,state.shown),f=state.filters;$("#results-title").textContent=f.source&&f.category?`${CATEGORY_LABELS[f.category]} — ${f.source}`:f.source?f.source:f.category?CATEGORY_LABELS[f.category]:"Todos os registros";
@@ -96,11 +100,28 @@ function renderCards(){
  $$(".open-detail").forEach(b=>b.onclick=()=>openDetail(b.dataset.id));$$(".review-action").forEach(b=>b.onclick=()=>toggleRemove(b.dataset.id));bindBookRelationButtons($("#cards"));
 }
 function findItem(id){return [...state.data.itens,...state.revisions.added.map(enrichAdded)].find(x=>getId(x)===id)}
-function openDetail(id){
- const item=findItem(id);if(!item)return;$("#detail-title").textContent=item.titulo||"Publicação";
+let detailRequest=0;
+function localOriginHTML(item){
+ const url=safeUrl(item.url_original||item.url_principal);
+ return url?'<div class="local-article-origin"><a class="source-link" href="'+esc(url)+'" target="_blank" rel="noopener">Abrir origem</a></div>':'<p class="local-origin-unavailable">Origem externa indisponível — conteúdo preservado no acervo.</p>';
+}
+function localDetailTail(item,id){
+ return localOriginHTML(item)+publicationBookHTML(item)+'<div class="detail-actions"><button class="button dark" data-detail-edit="'+esc(id)+'">Editar publicação</button><button class="button subtle detail-remove" data-detail-remove="'+esc(id)+'">'+(isRemoved(item)?"Restaurar registro":"Marcar para remoção")+'</button></div>';
+}
+function bindDetailActions(item,id){
+ const body=$("#detail-body");bindBookRelationButtons(body);body.querySelector("[data-detail-edit]").onclick=()=>{$("#detail-dialog").close();openEdit(id)};body.querySelector("[data-detail-remove]").onclick=async()=>{await toggleRemove(id);$("#detail-dialog").close()};
+}
+async function openDetail(id){
+ const request=++detailRequest,item=findItem(id);if(!item)return;$("#detail-title").textContent=item.titulo||"Publicação";const local=localContentItem(item),dialog=$("#detail-dialog"),body=$("#detail-body");
+ if(local){
+  body.innerHTML='<div class="local-article-loading"><span></span><p>Abrindo o conteúdo preservado…</p></div>';dialog.showModal();
+  try{const article=await window.HsiaLocalArticles.load(local);if(request!==detailRequest||!dialog.open)return;body.innerHTML='<article class="local-article">'+article+'</article>'+localDetailTail(item,id);bindDetailActions(item,id)}
+  catch(error){if(request!==detailRequest||!dialog.open)return;body.innerHTML='<div class="local-article-error"><strong>Não foi possível abrir o conteúdo preservado.</strong><p>Tente novamente em instantes.</p></div>'+localDetailTail(item,id);bindDetailActions(item,id)}
+  return;
+ }
  const links=[item.url_original,item.url_principal,...(item.urls_secundarias_lista||[])].map(safeUrl).filter((x,i,a)=>x&&a.indexOf(x)===i);
  $("#detail-body").innerHTML=`<div class="detail-grid"><div class="detail-field"><span>Fonte</span><strong>${esc(item.fonte)}</strong></div><div class="detail-field"><span>Formato</span><strong>${esc(item.categoria_label||CATEGORY_LABELS[item.categoria_painel])}</strong></div><div class="detail-field"><span>${esc(item.rotulo_credito)}</span><strong>${esc(item.credito_exibicao)}</strong></div><div class="detail-field"><span>Papel de Hsia</span><strong>${esc(item.participacao_hsia)}</strong></div><div class="detail-field"><span>Data</span><strong>${esc(fmtDate(item.data_publicacao||item.ano)||"Não informada")}</strong></div><div class="detail-field"><span>Identificador</span><strong>${esc(item.item_id||"Em revisão")}</strong></div><div class="detail-field full"><span>Evidência preservada</span><p>${esc(item.evidencia||item.texto_ou_evidencia_disponivel||"Metadados e link original preservados.")}</p></div><div class="detail-field full"><span>Links</span><div class="detail-links">${links.length?links.map((u,i)=>`<a href="${esc(u)}" target="_blank" rel="noopener">${i?"Fonte secundária":"Publicação original"} ↗</a>`).join(""):"Nenhum endereço disponível"}</div></div></div>${publicationBookHTML(item)}<div class="detail-actions"><button class="button dark" data-detail-edit="${esc(id)}">Editar publicação</button><button class="button subtle detail-remove" data-detail-remove="${esc(id)}">${isRemoved(item)?"Restaurar registro":"Marcar para remoção"}</button></div>`;
- bindBookRelationButtons($("#detail-body"));$("[data-detail-edit]").onclick=()=>{$("#detail-dialog").close();openEdit(id)};$("[data-detail-remove]").onclick=async()=>{await toggleRemove(id);$("#detail-dialog").close()};$("#detail-dialog").showModal();
+ bindDetailActions(item,id);dialog.showModal();
 }
 function setFilters(next){Object.assign(state.filters,next);state.shown=PAGE_SIZE;$("#query").value=state.filters.query||"";$("#filter-source").value=state.filters.source||"";$("#filter-category").value=state.filters.category||"";$("#filter-year").value=state.filters.year||"";renderCards();$("#publicacoes").scrollIntoView({behavior:"smooth"})}
 function renderReview(){
@@ -142,8 +163,8 @@ async function addItem(form){
  if(await saveChange({type:"add",item})){form.reset();activateTab("changes")}
 }
 function openEdit(id){
- const item=findItem(id);if(!item)return;const form=$("#edit-form");
- form.elements.original_id.value=id;for(const field of ["fonte","categoria_painel","titulo","autores","url_original","evidencia","revisor"]){const input=form.elements.namedItem(field);if(input)input.value=item[field]||""}form.elements.data_publicacao.value=dateForForm(item.data_publicacao);const bookBox=$("#edit-book-relations"),bookHtml=publicationBookHTML(item);bookBox.hidden=!bookHtml;bookBox.innerHTML=bookHtml;if(bookHtml)bindBookRelationButtons(bookBox);
+ const item=findItem(id);if(!item)return;const form=$("#edit-form"),local=localContentItem(item),internalEvidence=/hsia_linkedin_2017_2018_estruturado|[\\/]artigos[\\/]|\.(?:md|json)\b/i.test(item.evidencia||"");
+ form.elements.original_id.value=id;for(const field of ["fonte","categoria_painel","titulo","autores","url_original","evidencia","revisor"]){const input=form.elements.namedItem(field);if(input)input.value=field==="evidencia"&&local&&internalEvidence?"Conteúdo integral, imagens e tabelas preservados no acervo.":item[field]||""}form.elements.data_publicacao.value=dateForForm(item.data_publicacao);const bookBox=$("#edit-book-relations"),bookHtml=publicationBookHTML(item);bookBox.hidden=!bookHtml;bookBox.innerHTML=bookHtml;if(bookHtml)bindBookRelationButtons(bookBox);
  $("#edit-dialog").showModal();
 }
 async function editItem(form){

@@ -1,0 +1,27 @@
+# Os próximos da lista...
+
+Autor: Hsia Hua Sheng (Professor de Finanças Aplicadas da FGV-EAESP e da UNIFESP-EPPEN)
+
+Data 19/Agosto/2018
+
+Após as crises financeiras da Argentina e de Turquia, os investidores internacionais estão preocupados com as outras economias de mercado emergente. Há uma semana, o “limite” da desvalorização taxa de cambio 4,00 R$/US$ está sendo utilizado por muitos investidores estrangeiros como um termômetro de como os países emergentes estão se protegendo dessa “onda” de crises e volatilidade provocada por tendência de desaceleração de comercio e crescimento mundial e fortalecimento de US$.
+
+Se o Brasil não conseguir segurar a tendência de desvalorização de taxas de cambio 4,00 R$/US$, eles vão entender que os outros países emergentes em situação piores poderiam ter mais problema financeira. Consequentemente, os investidores internacionais poderiam gerar uma corrida para sacar recursos financeiros desses países e converte-los para US$ antes que outros investidores.... piorando de fato a crise. Mas, quem são os próximos países da lista?
+
+![Imagem 1](imagens/imagem_01.jpeg)
+
+Fonte Imagem: Google
+
+Os investidores internacionais estão preocupados com a África do Sul, México, Indonésia e Índia. Diferente de uma avaliação de riscos país para investimento em capital estrangeiro (IDE), a analise de investimentos estrangeiros em Bolsas de valores, títulos de dívidas e fundos estrangeiros foca em capacidade do país destino de ter dólares americanos no curto prazo para pagar os investidores estrangeiros, caso estes decidem deixar o país.
+
+Há duas variáveis que são essenciais para analisar se um país está preparado para essa volatilidade de fluxos internacionais. A primeira é a magnitude do déficit em transações correntes do país em relação ao Produto Interno Bruto (PIB), soma de todos os bens e serviços produzidos no país. A conta corrente considera balança comercial (exportações e importações), serviços e rendas e as transferências unilaterais.
+
+A segunda variável é a dívida externa total líquida em relação ao Produto Interno Bruto (PIB). A dívida externa líquida é o total da dívida externa deduzida das reservas internacionais, haveres de bancos comerciais e créditos brasileiros no exterior. A reserva internacional é importante pois ela poderia ser utilizado pelo Banco central para estabilizar sua taxa de cambio.
+
+Portanto, vamos monitorando essas dos indicadores para saber se há mais países vulneráveis para crise e vamos segurar nossa taxa de cambio até 4,0 R$ / US$ por bem do mercado emergente....
+
+Este artigo expressa a opinião do autor, não representando necessariamente a opinião institucional da FGV” © 2018 Hsia Hua Sheng All Rights Reserved.
+
+Para citação desse artigo: SHENG, H.H. “Os próximos da lista...” (Núcleo de Estudos de International Financial Management, FGV-EAESP), No. 41, 19/08/2018, São Paulo.
+
+Quer participar do Projeto “Ideias que Transformam”? Se você é aluno ou ex-aluno da FGV EAESP e tem “ideias que transformam” para compartilhar, envie seu artigo para o e-mail ideiasquetransformam@fgv.br. Caso seja escolhido, seu artigo poderá ser promovido pela escola e ganhar muitos leitores. http://www.fgv.br/eaesp/cursos/hsia-sheng/
