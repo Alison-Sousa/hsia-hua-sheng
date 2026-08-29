@@ -40,7 +40,9 @@ function revisionCount(){return state.revisions.removed.length+state.revisions.a
 function counts(items=activeItems()){const out={};for(const item of items){const s=item.fonte||"Fonte não informada",c=item.categoria_painel;out[s]??={};out[s][c]=(out[s][c]||0)+1;out[s].total=(out[s].total||0)+1}return out}
 function officialMeta(){
  const items=activeItems();$("#hero-total").textContent=items.length.toLocaleString("pt-BR");$("#hero-works").textContent=new Set(items.map(x=>x.item_id).filter(Boolean)).size.toLocaleString("pt-BR");$("#hero-sources").textContent=new Set(items.map(x=>x.fonte).filter(Boolean)).size.toLocaleString("pt-BR");
- const d=new Date(state.revisions.updated_at||state.data.meta.gerado_em);$("#updated-at").textContent=`Atualizado em ${d.toLocaleDateString("pt-BR")}`;
+ const dataDate=new Date(state.data.meta.gerado_em);
+ const revisionDate=state.revisions.updated_at?new Date(state.revisions.updated_at):null;
+ const d=revisionDate&&revisionDate>dataDate?revisionDate:dataDate;$("#updated-at").textContent=`Atualizado em ${d.toLocaleDateString("pt-BR")}`;
 }
 function renderChart(){
  const items=activeItems(),max=Math.max(1,...Object.keys(CATEGORY_LABELS).map(c=>items.filter(x=>x.categoria_painel===c).length));
