@@ -32,6 +32,8 @@ A revisão é aberta e automática, sem login ou senha. Qualquer visitante pode:
 
 Cada alteração é gravada em `data/revisoes_aprovadas.json` no GitHub. O workflow `.github/workflows/dashboard-revisoes.yml` recompõe automaticamente os CSVs, o JSON do painel e o Excel.
 
+O **github-actions[bot]** é a automação do GitHub responsável por manter o acervo sincronizado e atualizado automaticamente.
+
 Para ativar a gravação automática, crie no Netlify a variável secreta `GITHUB_TOKEN` com um token fine-grained do GitHub limitado ao repositório `Alison-Sousa/hsia-hua-sheng` e com permissão **Contents: Read and write**. Depois, faça um novo deploy. O token nunca é enviado ao navegador.
 ## Publicar no Netlify
 
