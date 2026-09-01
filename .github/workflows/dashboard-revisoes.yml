@@ -59,8 +59,8 @@ jobs:
           PY
       - name: Registrar resultados atualizados
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "Alison-Sousa"
+          git config user.email "116979938+Alison-Sousa@users.noreply.github.com"
           git add data/dashboard.json data/livro.json data/painel_itens.csv data/painel_volumetria.csv data/acervo_hsia_atualizado.xlsx data/creditos_editoriais.json
           git diff --cached --quiet || git commit -m "dashboard: atualizar CSVs e Excel"
           git push
